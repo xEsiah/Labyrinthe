@@ -26,20 +26,42 @@ def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
             )
 
     # Dessin du labyrinthe
-    for lab1 in range(2,lignes-3):
-        for lab2 in range(20,colonnes-2):
+    for sol1 in range(2,lignes-3):
+        for sol2 in range(20,colonnes-2):
             canvas.create_rectangle(
-                lab2 * taille_cellules, lab1 * taille_cellules,
-                (lab2 + 1) * taille_cellules, (lab1 + 1) * taille_cellules,
+                sol2 * taille_cellules, sol1 * taille_cellules,
+                (sol2 + 1) * taille_cellules, (sol1 + 1) * taille_cellules,
                 fill="darkgray", outline="gray"
             )
-    for MursExt1 in range(2,3):
-        for MursExt2 in range(20,colonnes-2):
+            
+    for murshaut1 in range(2,3):
+        for murshaut2 in range(20,colonnes-2):
             canvas.create_rectangle(
-                MursExt2 * taille_cellules, MursExt1 * taille_cellules,
-                (MursExt2 + 1) * taille_cellules, (MursExt1 + 1) * taille_cellules,
+                murshaut2 * taille_cellules, murshaut1 * taille_cellules,
+                (murshaut2 + 1) * taille_cellules, (murshaut1 + 1) * taille_cellules,
+                fill="black", outline="gray"
+            )
+    for mursbas1 in range(46,47):
+        for mursbas2 in range(20,colonnes-2):
+            canvas.create_rectangle(
+                mursbas2 * taille_cellules, mursbas1 * taille_cellules,
+                (mursbas2 + 1) * taille_cellules, (mursbas1 + 1) * taille_cellules,
                 fill="black", outline="gray"
             )
 
+    for mursdroite1 in range(3,47):
+        for mursdroite2 in range(20,78):
+            if mursdroite2 == 20 or mursdroite2 == 77:
+                canvas.create_rectangle(
+                    mursdroite2 * taille_cellules, mursdroite1 * taille_cellules,
+                    (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
+                    fill="black", outline="gray"
+                )
+            if (mursdroite1 == 29 and mursdroite2 == 77) or (mursdroite1 == 11 and mursdroite2 == 20):
+                canvas.create_rectangle(
+                    mursdroite2 * taille_cellules, mursdroite1 * taille_cellules,
+                    (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
+                    fill="red", outline="gray"
+                )
     
     fenetre.mainloop()
