@@ -57,7 +57,7 @@ def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
                     (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
                     fill="black", outline="gray"
                 )
-            if (mursdroite1 == 29 and mursdroite2 == 77) or (mursdroite1 == 11 and mursdroite2 == 20):
+            if (mursdroite1 == 11 and mursdroite2 == 20) or (mursdroite1 == 29 and mursdroite2 == 77) or (mursdroite1 == 11 and mursdroite2 == 21) or (mursdroite1 == 29 and mursdroite2 == 76) : # conidition pour les portes
                 canvas.create_rectangle(
                     mursdroite2 * taille_cellules, mursdroite1 * taille_cellules,
                     (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
