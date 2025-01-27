@@ -6,6 +6,7 @@ def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
     fenetre = Tk()
     fenetre.title("Labyrinthe")
     fenetre.state("zoomed")
+    fenetre.attributes("-fullscreen", True)
 
     # Obtenir la taille de l'écran
     largeur_ecran = fenetre.winfo_screenwidth()
