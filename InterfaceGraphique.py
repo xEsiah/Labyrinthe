@@ -1,77 +1,91 @@
 from tkinter import *
+import random
 
 
-def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
-    # Fenetre principale 
+def ajuster_taille(fenetre, lignes, colonnes):
+    largeur_ecran = fenetre.winfo_width()
+    hauteur_ecran = fenetre.winfo_height()
+
+    taille_cellule_x = largeur_ecran // colonnes
+    taille_cellule_y = hauteur_ecran // lignes
+    return min(taille_cellule_x, taille_cellule_y)
+
+
+import random
+
+def generer_labyrinthe(lignes, colonnes):
+    labyrinthe = [['#' for _ in range(colonnes)] for _ in range(lignes)]
+
+    def dfs(x, y):
+        """Exploration en profondeur pour créer un labyrinthe"""
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        random.shuffle(directions)  # Mélanger les directions de manière aléatoire
+
+        for dx, dy in directions:
+            nx, ny = x + dx * 2, y + dy * 2
+            if 0 < nx < lignes - 1 and 0 < ny < colonnes - 1 and labyrinthe[nx][ny] == '#':
+                labyrinthe[nx][ny] = '.'
+                labyrinthe[x + dx][y + dy] = '.'
+                dfs(nx, ny)
+
+    # Définir l'entrée et la sortie fixes
+    entree = (1, 0)  # Entrée en haut à gauche
+    sortie = (lignes - 2, colonnes - 2)  # Sortie en bas à droite
+
+    # Définir l'entrée et la sortie comme chemins
+    labyrinthe[entree[1]][entree[1]] = '.'
+    labyrinthe[sortie[0]][sortie[1]] = '.'
+
+    # Générer le labyrinthe à partir de l'entrée
+    dfs(entree[0], entree[1])
+
+    return labyrinthe
+
+
+
+def dessiner_labyrinthe(canvas, labyrinthe, lignes, colonnes, taille_cellule):
+    """Dessine le labyrinthe sur le canvas"""
+    for i in range(lignes):
+        for j in range(colonnes):
+            x1, y1 = j * taille_cellule, i * taille_cellule
+            x2, y2 = (j + 1) * taille_cellule, (i + 1) * taille_cellule
+            color = 'white' if labyrinthe[i][j] == '.' else 'black'
+            canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline='gray')
+
+
+def dessiner_labyrinthe_complet(fenetre, canvas, lignes, colonnes):
+    """Met à jour la fenêtre en redessinant la grille et le labyrinthe"""
+    taille_cellule = ajuster_taille(fenetre, lignes, colonnes)
+    labyrinthe = generer_labyrinthe(lignes, colonnes)
+    canvas.delete("all")  # Supprimer tous les objets existants
+    dessiner_labyrinthe(canvas, labyrinthe, lignes, colonnes, taille_cellule)
+
+
+def InterfaceLabyrinthe(lignes, colonnes):
+    """Interface principale pour afficher le labyrinthe"""
     fenetre = Tk()
     fenetre.title("Labyrinthe")
     fenetre.state("zoomed")
     fenetre.attributes("-fullscreen", True)
 
-    # Obtenir la taille de l'écran
-    largeur_ecran = fenetre.winfo_screenwidth()
-    hauteur_ecran = fenetre.winfo_screenheight()
-
-    # Calculer la taille des cellules pour s'adapter à l'écran
-    taille_cellule_x = largeur_ecran // colonnes
-    taille_cellule_y = hauteur_ecran // lignes
-    taille_cellule = min(taille_cellule_x, taille_cellule_y)
-
-    # Création du canvas
+    # Créer le canvas
     canvas = Canvas(
         fenetre,
-        width=colonnes * taille_cellule,
-        height=lignes * taille_cellule,
+        width=fenetre.winfo_screenwidth(),
+        height=fenetre.winfo_screenheight(),
         bg="white"
     )
     canvas.pack(fill=BOTH, expand=True)
 
-    # Dessin des cellules
-    for background1 in range(lignes):
-        for background2 in range(colonnes):
-            canvas.grid_anchor
-            canvas.create_rectangle(
-                background2 * taille_cellules, background1 * taille_cellules,
-                (background2 + 1) * taille_cellules, (background1 + 1) * taille_cellules,
-                fill="silver", outline="gray"
-            )
+    # Dessiner le labyrinthe initial
+    dessiner_labyrinthe_complet(fenetre, canvas, lignes, colonnes)
 
-    # Dessin du labyrinthe
-    for sol1 in range(2,lignes-3):
-        for sol2 in range(20,colonnes-2):
-            canvas.create_rectangle(
-                sol2 * taille_cellules, sol1 * taille_cellules,
-                (sol2 + 1) * taille_cellules, (sol1 + 1) * taille_cellules,
-                fill="darkgray", outline="gray"
-            )
-            
-    for murshaut1 in range(2,3):
-        for murshaut2 in range(20,colonnes-2):
-            canvas.create_rectangle(
-                murshaut2 * taille_cellules, murshaut1 * taille_cellules,
-                (murshaut2 + 1) * taille_cellules, (murshaut1 + 1) * taille_cellules,
-                fill="black", outline="gray"
-            )
-    for mursbas1 in range(46,47):
-        for mursbas2 in range(20,colonnes-2):
-            canvas.create_rectangle(
-                mursbas2 * taille_cellules, mursbas1 * taille_cellules,
-                (mursbas2 + 1) * taille_cellules, (mursbas1 + 1) * taille_cellules,
-                fill="black", outline="gray"
-            )
+    # Mettre à jour l'affichage lorsque la taille de la fenêtre change
+    fenetre.bind("<Configure>", lambda event: dessiner_labyrinthe_complet(fenetre, canvas, lignes, colonnes))
 
-    for mursdroite1 in range(3,47):
-        for mursdroite2 in range(20,78):
-            if mursdroite2 == 20 or mursdroite2 == 77:
-                canvas.create_rectangle(
-                    mursdroite2 * taille_cellules, mursdroite1 * taille_cellules,
-                    (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
-                    fill="black", outline="gray"
-                )
-            if (mursdroite1 == 11 and mursdroite2 == 20) or (mursdroite1 == 29 and mursdroite2 == 77) or (mursdroite1 == 11 and mursdroite2 == 21) or (mursdroite1 == 29 and mursdroite2 == 76) : # conidition pour les portes
-                canvas.create_rectangle(
-                    mursdroite2 * taille_cellules, mursdroite1 * taille_cellules,
-                    (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
-                    fill="red", outline="gray"
-                )
+    # Lancer l'application
     fenetre.mainloop()
+
+
+# Exemple d'appel avec un labyrinthe de 30 lignes et 60 colonnes
+
