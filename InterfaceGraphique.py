@@ -1,19 +1,29 @@
 from tkinter import *
 
+
 def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
     # Fenetre principale 
-    fenetre = Tk() 
-    fenetre.title ("LabyteRINTHE") 
+    fenetre = Tk()
+    fenetre.title("Labyrinthe")
     fenetre.state("zoomed")
+
+    # Obtenir la taille de l'écran
+    largeur_ecran = fenetre.winfo_screenwidth()
+    hauteur_ecran = fenetre.winfo_screenheight()
+
+    # Calculer la taille des cellules pour s'adapter à l'écran
+    taille_cellule_x = largeur_ecran // colonnes
+    taille_cellule_y = hauteur_ecran // lignes
+    taille_cellule = min(taille_cellule_x, taille_cellule_y)
 
     # Création du canvas
     canvas = Canvas(
         fenetre,
-        width=colonnes * taille_cellules,
-        height=lignes * taille_cellules,
+        width=colonnes * taille_cellule,
+        height=lignes * taille_cellule,
         bg="white"
     )
-    canvas.pack()
+    canvas.pack(fill=BOTH, expand=True)
 
     # Dessin des cellules
     for background1 in range(lignes):
@@ -63,5 +73,4 @@ def InterfaceLabyrinthe(lignes, colonnes, taille_cellules):
                     (mursdroite2 + 1) * taille_cellules, (mursdroite1 + 1) * taille_cellules,
                     fill="red", outline="gray"
                 )
-    
     fenetre.mainloop()
