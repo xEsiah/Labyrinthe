@@ -66,11 +66,8 @@ hauteur_ecran = 900
 taille_cellule = 30
 entree = [30,180,330,480,870]
 sortie = [30,180,330,480,870]
-print(largeur_ecran,hauteur_ecran)
 
 """ APPELS FONCTIONS """
 
 BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
-print(taille_cellule)
-
 fenetre.mainloop()
