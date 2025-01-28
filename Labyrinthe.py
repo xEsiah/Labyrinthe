@@ -12,23 +12,36 @@ def InterfaceLabyrinthe():
     return fenetre
 
 def BaseLabyrinthe(largeur, hauteur, cellules, support):
-    
-    canvas = Canvas(
+    canvas_base_labyrinthe = Canvas(
         support,
         width=largeur,
         height=hauteur,
         bg="darkgray"
     )
-    canvas.pack(fill=BOTH, expand=True)
+    canvas_base_labyrinthe.pack(fill=BOTH, expand=True)
     
-    for background1 in range(cellules, hauteur-cellules, cellules):  # Parcours des lignes
-        for background2 in range(cellules*20, largeur-cellules*2, cellules):  # Parcours des colonnes
-            canvas.create_rectangle(
-                background2, background1,
-                background2 + cellules, background1 + cellules,
-                fill="silver", outline="gray"
+
+    for y in range(cellules, hauteur-cellules, cellules):  # Parcours des lignes
+        for x in range(cellules*20, largeur-cellules*2, cellules):  # Parcours des colonnes
+            canvas_base_labyrinthe.create_rectangle(
+                x, y,
+                x + cellules, y + cellules,
+                fill="silver", outline="gray",     
+            )
+            if x == cellules*20 or x == cellules*69 or y == (cellules*38) or y == cellules:
+                canvas_base_labyrinthe.create_rectangle(
+                x, y,
+                x + cellules, y + cellules,
+                fill="black", outline="gray",      
             )
             
+    return 
+
+            
+# def MursLabyrinthe(largeur, hauteur, cellules, support):
+    
+    
+
 
 
 """ VARIABLES """
@@ -41,6 +54,10 @@ taille_cellule = min(largeur_ecran, hauteur_ecran) // 40
 
 """ APPELS FONCTIONS"""
 
+
 BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
+# MursLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
+coins = BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
+
 
 fenetre.mainloop()
