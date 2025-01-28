@@ -14,28 +14,33 @@ def InterfaceLabyrinthe():
     return fenetre
 
 def BaseLabyrinthe(largeur, hauteur, cellules, support):
+    # Centrer le canevas dans la fenêtre
+    frame = Frame(support)
+    frame.pack(fill=BOTH, expand=True)
+
+    # Canevas
     canvas_base_labyrinthe = Canvas(
-        support,
+        frame,
         width=largeur,
         height=hauteur,
         bg="darkgray"
     )
-    canvas_base_labyrinthe.pack(fill=BOTH, expand=True)
     
-    entree_random = [30,180,330,480,870]
-    sortie_random = [30,180,330,480,870]
+    canvas_base_labyrinthe.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+    entree_random = [90,180,330,480,840]
+    sortie_random = [90,180,330,480,840]
     entree = random.choice(entree_random)
     sortie = random.choice(sortie_random)
-    print(entree,sortie)
 
-    for y in range(0, hauteur+cellules, cellules):  # Parcours des lignes
-        for x in range(0, largeur+cellules, cellules):  # Parcours des colonnes
+    for y in range(0, hauteur, cellules):  # y = lignes
+        for x in range(0, largeur, cellules):  # x = colonnes
             canvas_base_labyrinthe.create_rectangle(
                 x, y,
                 x + cellules, y + cellules,
                 fill="silver", outline="gray",     
             )
-            if x == 0 or x == largeur or y == 0 or y == hauteur:
+            if x == 0 or x == largeur-cellules or y == 0 or y == hauteur-cellules:
                 canvas_base_labyrinthe.create_rectangle(
                 x, y,
                 x + cellules, y + cellules,
@@ -47,7 +52,7 @@ def BaseLabyrinthe(largeur, hauteur, cellules, support):
         fill="red", outline="gray",      
     )      
     canvas_base_labyrinthe.create_rectangle(
-        sortie, hauteur + cellules,
+        sortie, hauteur-cellules,
         sortie + cellules, hauteur,
         fill="blue", outline="gray",      
     )
@@ -63,7 +68,7 @@ entree = [30,180,330,480,870]
 sortie = [30,180,330,480,870]
 print(largeur_ecran,hauteur_ecran)
 
-""" APPELS FONCTIONS"""
+""" APPELS FONCTIONS """
 
 BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
 print(taille_cellule)
