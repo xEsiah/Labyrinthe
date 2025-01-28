@@ -11,7 +11,10 @@ taille_cellule = 30
 entree_random = [90,180,330,480,840] # Pour pouvoir plus tard définir l'entrée aléatoirement
 sortie_random = [90,180,330,480,840] # Pour pouvoir plus tard définir la sortie aléatoirement
 case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
-murs = []
+
+liste_murs = []
+liste_cases_mystère = []
+liste_cases_passage = []
 
 ''' FONCTIONS & PROGRAMMES '''
 
@@ -71,19 +74,27 @@ def dessin_terrain(terrain_à_générer): # fonction pour dessiner les cases mur
         )
     return 
     
-def generation_terrain(nombre_aléatoire,y,x): # fonction pour déterminer les probabilité de générer une case mur ou une case sol
+def generation_terrain(nombre_aléatoire,y,x,mystere): # fonction pour déterminer les probabilité de générer une case mur ou une case sol
     if nombre_aléatoire < 50:
         dessin_terrain(0)
+        liste_murs.append([x,y])
     elif nombre_aléatoire > 50 and nombre_aléatoire < 60:
         dessin_terrain(1)
-        murs.append([x,y])
+        choix_case_mystere = random.choice(mystere)
+        print(choix_case_mystere)
+        # for key in keys(choix_case_mystere):
+        #     for value in range(len(choix_case_mystere)):
+        #         print(choix_case_mystere[value])
+        # liste_cases_mystère.append([x,y])
     else:
         dessin_terrain(2)
+        liste_cases_passage.append([x,y])
+    return 
 
 for mursy in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
     for mursx in range(30, largeur_ecran-30, taille_cellule):  # x = colonnes
         nombre = random.randint(0,100)
-        generation_terrain(nombre, mursy, mursx)
+        generation_terrain(nombre, mursy, mursx,case_mystere)
         dimension_labyrinthe.create_rectangle( # configuration entree
             entree, 0,
             entree + taille_cellule, taille_cellule*2,
@@ -94,23 +105,11 @@ for mursy in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
             sortie + taille_cellule, hauteur_ecran-taille_cellule*2,
             fill="white", outline="darkgrey",      
         )
-print(murs)    
-    # for i in range (30, largeur_ecran-30, taille_cellule): 
         
-    #     murs.append[i]
-    #     print(murs)
-
-
-# choix_case_mystere = random.choice(case_mystere)
-# print(choix_case_mystere)
-# choix_element_case_mystere = random.randint(choix_case_mystere)
-# print(choix_element_case_mystere)
-# dimension_labyrinthe.create_rectangle(
-#     mursy, mursx,
-#     mursy + taille_cellule, mursx + taille_cellule,
-#     fill="black", outline="darkgrey", 
-# )   
-        
+# print("MURS\n",liste_murs) 
+# print("Mystere\n",liste_cases_mystère)
+# print("Passage\n",liste_cases_passage)
+# print(len(liste_cases_mystère+liste_cases_passage+liste_murs))
         
         
 """ APPELS FONCTIONS """
