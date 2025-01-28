@@ -8,8 +8,8 @@ import random
 largeur_ecran = 900
 hauteur_ecran = 900
 taille_cellule = 30
-entree = [30,180,330,480,870]
-sortie = [30,180,330,480,870]
+entree_random = [90,180,330,480,840] 
+sortie_random = [90,180,330,480,840]
 
 ''' FONCTIONS & PROGRAMMES '''
 
@@ -36,11 +36,11 @@ dimension_labyrinthe.place(relx=0.5, rely=0.5, anchor=CENTER) # Placement du lab
     
 for y in range(0, hauteur_ecran, taille_cellule):  # y = lignes
     for x in range(0, largeur_ecran, taille_cellule):  # x = colonnes
-        dimension_labyrinthe.create_rectangle(
-            x, y,
-            x + taille_cellule, y + taille_cellule,
-            fill="silver", outline="gray",     
-        )
+        # dimension_labyrinthe.create_rectangle(
+        #     x, y,
+        #     x + taille_cellule, y + taille_cellule,
+        #     fill="silver", outline="gray",     
+        # )
         if x == 0 or x == largeur_ecran-taille_cellule or y == 0 or y == hauteur_ecran-taille_cellule:
             dimension_labyrinthe.create_rectangle(
             x, y,
@@ -49,8 +49,6 @@ for y in range(0, hauteur_ecran, taille_cellule):  # y = lignes
         ) 
 
 # 25 configurations différentes pour l'entrée et la sortie
-entree_random = [90,180,330,480,840] 
-sortie_random = [90,180,330,480,840]
 entree = random.choice(entree_random)
 sortie = random.choice(sortie_random)
 dimension_labyrinthe.create_rectangle( # configuration entree
@@ -64,6 +62,36 @@ dimension_labyrinthe.create_rectangle( # configuration sortie
     fill="white", outline="gray",      
 )
 
+
+patternes_labyrinthe = [1,2,3,4,5,6]
+match(patternes_labyrinthe):
+    case 1:
+        for i in range(12):
+            dimension_labyrinthe.create_rectangle(
+                i, i,
+                i + taille_cellule, i + taille_cellule,
+                fill="grey85", outline="white", 
+            )
+        
+
+    
+murs = [0,1]
+placement_murs = random.choice(murs)
+
+for mursy in range(30, hauteur_ecran-30, taille_cellule*4):  # y = lignes
+    for mursx in range(30, largeur_ecran-30, taille_cellule*4):  # x = colonnes
+        placement_murs = random.choice(murs)
+        if placement_murs == 1 :
+            placement_patternes = random.choices(patternes_labyrinthe)
+            
+        else:
+            dimension_labyrinthe.create_rectangle(
+                mursx, mursy,
+                mursx + taille_cellule, mursy + taille_cellule,
+                fill="grey85", outline="white", 
+            )
+            
+        
 
 """ APPELS FONCTIONS """
 
