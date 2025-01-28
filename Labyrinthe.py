@@ -1,14 +1,16 @@
 from tkinter import *
 from dicCoffres import dictionnaire_coffres
 from dicPieges import dictionnaire_pieges
+import random
 
 ''' FONCTIONS '''
 
 def InterfaceLabyrinthe():
     # Fenetre principale 
     fenetre = Tk()
-    fenetre.title("Labyrinthe")
     fenetre.attributes("-fullscreen", True)
+    fenetre.title("Labyrinthe")
+    
     return fenetre
 
 def BaseLabyrinthe(largeur, hauteur, cellules, support):
@@ -20,44 +22,50 @@ def BaseLabyrinthe(largeur, hauteur, cellules, support):
     )
     canvas_base_labyrinthe.pack(fill=BOTH, expand=True)
     
+    entree_random = [30,180,330,480,870]
+    sortie_random = [30,180,330,480,870]
+    entree = random.choice(entree_random)
+    sortie = random.choice(sortie_random)
+    print(entree,sortie)
 
-    for y in range(cellules, hauteur-cellules, cellules):  # Parcours des lignes
-        for x in range(cellules*20, largeur-cellules*2, cellules):  # Parcours des colonnes
+    for y in range(0, hauteur+cellules, cellules):  # Parcours des lignes
+        for x in range(0, largeur+cellules, cellules):  # Parcours des colonnes
             canvas_base_labyrinthe.create_rectangle(
                 x, y,
                 x + cellules, y + cellules,
                 fill="silver", outline="gray",     
             )
-            if x == cellules*20 or x == cellules*69 or y == (cellules*38) or y == cellules:
+            if x == 0 or x == largeur or y == 0 or y == hauteur:
                 canvas_base_labyrinthe.create_rectangle(
                 x, y,
                 x + cellules, y + cellules,
                 fill="black", outline="gray",      
-            )
-            
+            )       
+    canvas_base_labyrinthe.create_rectangle(
+        entree, 0,
+        entree + cellules, cellules,
+        fill="red", outline="gray",      
+    )      
+    canvas_base_labyrinthe.create_rectangle(
+        sortie, hauteur + cellules,
+        sortie + cellules, hauteur,
+        fill="blue", outline="gray",      
+    )
     return 
-
-            
-# def MursLabyrinthe(largeur, hauteur, cellules, support):
-    
-    
-
-
 
 """ VARIABLES """
 
 fenetre = InterfaceLabyrinthe()
-largeur_ecran = fenetre.winfo_screenwidth()
-hauteur_ecran = fenetre.winfo_screenheight()
-taille_cellule = min(largeur_ecran, hauteur_ecran) // 40
-
+largeur_ecran = 900
+hauteur_ecran = 900
+taille_cellule = 30
+entree = [30,180,330,480,870]
+sortie = [30,180,330,480,870]
+print(largeur_ecran,hauteur_ecran)
 
 """ APPELS FONCTIONS"""
 
-
 BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
-# MursLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
-coins = BaseLabyrinthe(largeur_ecran, hauteur_ecran, taille_cellule, fenetre)
-
+print(taille_cellule)
 
 fenetre.mainloop()
