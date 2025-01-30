@@ -1,6 +1,4 @@
 from tkinter import *
-from dicCoffres import dictionnaire_coffres
-from dicPieges import dictionnaire_pieges
 import random
 
 """ VARIABLES """
@@ -10,11 +8,30 @@ hauteur_ecran = 900
 taille_cellule = 30
 entree_random = [90,180,330,480,840] # Pour pouvoir plus tard définir l'entrée aléatoirement
 sortie_random = [90,180,330,480,840] # Pour pouvoir plus tard définir la sortie aléatoirement
-case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
+
+""" Dictionnaire & Liste """
+
+dictionnaire_pieges = [
+    ["Piques",[0, 1, 2, 3, 4, 5]], 
+    ["Trappes",[0, 1, 2, 3, 4, 5]], 
+    ["Pièges à ours",[0, 1, 2, 3, 4, 5]], 
+    ["Flèches empoisonnées",[0, 1, 2, 3, 4, 5]], 
+    ["Plaques piégées",[0, 1, 2, 3, 4, 5]],
+    ]
+
+dictionnaire_coffres = {
+    ["Carte",[0, 1]], 
+    ["Potion de soin",[0, 1]], 
+    ["Plaque d'armure",[0, 1, 2]]
+}
+
+""" Liste cases """
 
 liste_murs = []
 liste_cases_mystère = []
 liste_cases_passage = []
+liste_evenements = []
+case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
 
 ''' FONCTIONS & PROGRAMMES '''
 
@@ -80,12 +97,10 @@ def generation_terrain(nombre_aléatoire,y,x,mystere): # fonction pour détermin
         liste_murs.append([x,y])
     elif nombre_aléatoire > 50 and nombre_aléatoire < 60:
         dessin_terrain(1)
-        choix_case_mystere = random.choice(mystere)
-        print(choix_case_mystere)
-        # for key in keys(choix_case_mystere):
-        #     for value in range(len(choix_case_mystere)):
-        #         print(choix_case_mystere[value])
-        # liste_cases_mystère.append([x,y])
+        
+            
+            # randomizer les pieges et le nombre 
+        liste_cases_mystère.append([x,y])
     else:
         dessin_terrain(2)
         liste_cases_passage.append([x,y])
@@ -110,7 +125,7 @@ for mursy in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
 # print("Mystere\n",liste_cases_mystère)
 # print("Passage\n",liste_cases_passage)
 # print(len(liste_cases_mystère+liste_cases_passage+liste_murs))
-        
+
         
 """ APPELS FONCTIONS """
 
