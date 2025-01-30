@@ -16,7 +16,6 @@ sortie_random = [90,180,330,480,840] # Pour pouvoir plus tard définir la sortie
 
 dictionnaire_pieges = [["Piques"],["Trappes"],["Pièges à ours"],["Flèches empoisonnées"],["Plaques piégées"]]
 dictionnaire_coffres = [["Carte"], ["Potion de soin"], ["Plaque d'armure"]]
-lc_murs = []
 liste_evenements = []
 case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
 personnage = {
@@ -26,6 +25,23 @@ personnage = {
     "Plaque d'armure" : 0,
     "Potion de soin" : 0,
 }
+lc_murs = [[0, 0], [0, 30], [0, 60], [0, 90], [0, 120], [0, 150], [0, 180], [0, 210], 
+ [0, 240], [0, 270], [0, 300], [0, 330], [0, 360], [0, 390], [0, 420], [0, 450], 
+ [0, 480], [0, 510], [0, 540], [0, 570], [0, 600], [0, 630], [0, 660], [0, 690], 
+ [0, 720], [0, 750], [0, 780], [0, 810], [0, 840], [0, 870], [0, 900],[0, 0], [30, 0], [60, 0], [90, 0], [120, 0], [150, 0], [180, 0], [210, 0], 
+ [240, 0], [270, 0], [300, 0], [330, 0], [360, 0], [390, 0], [420, 0], [450, 0], 
+ [480, 0], [510, 0], [540, 0], [570, 0], [600, 0], [630, 0], [660, 0], [690, 0], 
+ [720, 0], [750, 0], [780, 0], [810, 0], [840, 0], [870, 0], [900, 0],[900, 0], [900, 30], [900, 60], [900, 90], [900, 120], [900, 150], 
+ [900, 180], [900, 210], [900, 240], [900, 270], [900, 300], [900, 330], 
+ [900, 360], [900, 390], [900, 420], [900, 450], [900, 480], [900, 510], 
+ [900, 540], [900, 570], [900, 600], [900, 630], [900, 660], [900, 690], 
+ [900, 720], [900, 750], [900, 780], [900, 810], [900, 840], [900, 870], 
+ [900, 900],[0, 900], [30, 900], [60, 900], [90, 900], [120, 900], [150, 900], 
+ [180, 900], [210, 900], [240, 900], [270, 900], [300, 900], [330, 900], 
+ [360, 900], [390, 900], [420, 900], [450, 900], [480, 900], [510, 900], 
+ [540, 900], [570, 900], [600, 900], [630, 900], [660, 900], [690, 900], 
+ [720, 900], [750, 900], [780, 900], [810, 900], [840, 900], [870, 900], 
+ [900, 900]]
 
 
 ''' FONCTIONS & PROGRAMMES '''
@@ -130,24 +146,52 @@ personnage = dimension_labyrinthe.create_rectangle(
 )
 
 def deplacement_personnage(event):
+    x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
+    nouveauX, nouveauY = int(x1), int(y1)
     if event.keysym == "Up":
-        dimension_labyrinthe.move(personnage, 0, -taille_cellule)
+        nouveauY -= taille_cellule
+        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
+        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
+        nouvellescoord = [int(x1)-5, int(y1)-5]
+        if nouvellescoord in lc_murs:
+            dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1 + taille_cellule)
+     
     elif event.keysym == "Down":
-        dimension_labyrinthe.move(personnage, 0, taille_cellule)
+        nouveauY += taille_cellule
+        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
+        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
+        nouvellescoord = [int(x1)-5, int(y1)-5]
+        if nouvellescoord in lc_murs:
+            dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1 - taille_cellule) 
+            
     elif event.keysym == "Left":
-        dimension_labyrinthe.move(personnage, -taille_cellule, 0)
+        nouveauX -= taille_cellule
+        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
+        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
+        nouvellescoord = [int(x1)-5, int(y1)-5]
+        if nouvellescoord in lc_murs:
+            dimension_labyrinthe.move(personnage, nouveauX - x1 + taille_cellule, nouveauY - y1)
+        
     elif event.keysym == "Right":
-        dimension_labyrinthe.move(personnage, taille_cellule, 0)
-        
-        
+        nouveauX += taille_cellule
+        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
+        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
+        nouvellescoord = [int(x1)-5, int(y1)-5]
+        if nouvellescoord in lc_murs:
+            dimension_labyrinthe.move(personnage, nouveauX - x1 - taille_cellule, nouveauY - y1) 
+
+   
+   
+   
+
 """ APPELS FONCTIONS """
 
 
 fenetre_jeu.bind("<Up>", deplacement_personnage)
 fenetre_jeu.bind("<Down>", deplacement_personnage)
 fenetre_jeu.bind("<Left>", deplacement_personnage)
-fenetre_jeu.bind("<Right>", deplacement_personnage)
-print(lc_murs,len(lc_murs))
+fenetre_jeu.bind("<Right>", deplacement_personnage)  
+print(lc_murs)
 fenetre_jeu.mainloop()
 
 
