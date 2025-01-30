@@ -9,7 +9,7 @@ taille_cellule = 30
 entree_random = [90,180,330,480,840] # Pour pouvoir plus tard définir l'entrée aléatoirement
 sortie_random = [90,180,330,480,840] # Pour pouvoir plus tard définir la sortie aléatoirement
 
-""" Dictionnaire & Liste """
+""" DICTIONNAIRES ET LISTES """
 
 dictionnaire_pieges = [
     ["Piques",[0, 1, 2, 3, 4, 5]], 
@@ -18,18 +18,23 @@ dictionnaire_pieges = [
     ["Flèches empoisonnées",[0, 1, 2, 3, 4, 5]], 
     ["Plaques piégées",[0, 1, 2, 3, 4, 5]],
     ]
-
-dictionnaire_coffres = {
+dictionnaire_coffres = [
     ["Carte",[0, 1]], 
     ["Potion de soin",[0, 1]], 
     ["Plaque d'armure",[0, 1, 2]]
+]
+personnage = {
+    "Points de vie": 0,
+    "Rapidité": 0,
+    "Vision": 0,
 }
+
 
 """ Liste cases """
 
 liste_murs = []
 liste_cases_mystère = []
-liste_cases_passage = []
+liste_case_sol = []
 liste_evenements = []
 case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
 
@@ -47,7 +52,7 @@ fond_fenetre = Frame(
 )
 fond_fenetre.pack(fill=BOTH, expand=True)
 
-# Création et positionnement de la base du labyrinthe (Dimensions et murs extérieurs)
+''' Création et positionnement de la base du labyrinthe (Dimensions et murs extérieurs) '''
 dimension_labyrinthe = Canvas( 
     fenetre_jeu,
     width=largeur_ecran,
@@ -70,6 +75,7 @@ for y in range(0, hauteur_ecran, taille_cellule):  # y = lignes
 entree = random.choice(entree_random)
 sortie = random.choice(sortie_random)
 
+''' Creation murs intérieurs (randomisées) et cases sols dont cases objets '''
 def dessin_terrain(terrain_à_générer): # fonction pour dessiner les cases murs et les cases sols
     if terrain_à_générer == 0:
         dimension_labyrinthe.create_rectangle(
@@ -103,7 +109,7 @@ def generation_terrain(nombre_aléatoire,y,x,mystere): # fonction pour détermin
         liste_cases_mystère.append([x,y])
     else:
         dessin_terrain(2)
-        liste_cases_passage.append([x,y])
+        liste_case_sol.append([x,y])
     return 
 
 for mursy in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
@@ -120,7 +126,30 @@ for mursy in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
             sortie + taille_cellule, hauteur_ecran-taille_cellule*2,
             fill="white", outline="darkgrey",      
         )
+
+''' Fonction pour insérer et déplacer le personnage dans le labyrinthe '''
+rectangle = dimension_labyrinthe.create_rectangle(
+    entree + 5, 5,  # Départ légèrement à l'intérieur de l'entrée
+    entree + taille_cellule - 5, taille_cellule - 5,
+    fill="aqua", outline="black"
+)
+
+def move_rectangle(event):
+    if event.keysym == "Up":
+        dimension_labyrinthe.move(rectangle, 0, -taille_cellule)
+    elif event.keysym == "Down":
+        dimension_labyrinthe.move(rectangle, 0, taille_cellule)
+    elif event.keysym == "Left":
+        dimension_labyrinthe.move(rectangle, -taille_cellule, 0)
+    elif event.keysym == "Right":
+        dimension_labyrinthe.move(rectangle, taille_cellule, 0)
         
+fenetre_jeu.bind("<Up>", move_rectangle)
+fenetre_jeu.bind("<Down>", move_rectangle)
+fenetre_jeu.bind("<Left>", move_rectangle)
+fenetre_jeu.bind("<Right>", move_rectangle)
+
+
 # print("MURS\n",liste_murs) 
 # print("Mystere\n",liste_cases_mystère)
 # print("Passage\n",liste_cases_passage)
