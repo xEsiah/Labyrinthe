@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import font
 import random
 
 
@@ -12,6 +13,7 @@ taille_cellule = 30
 ouvertures = [90,180,270,360,840] # Pour pouvoir définir l'entrée et la sortie
 entree = random.choice(ouvertures) 
 sortie = random.choice(ouvertures)
+
 
 """--------- DICTIONNAIRES ET LISTES ---------"""
 
@@ -39,12 +41,11 @@ fenetre_jeu.attributes("-fullscreen", True)
 fenetre_jeu.title("Labyrinthe")
 fond_fenetre = Frame(
     fenetre_jeu,
-    background="thistle4",
+    background="grey12",
     border= 10,
     relief="sunken",
 )
 fond_fenetre.pack(fill=BOTH, expand=True)
-
 
 ''' Création et positionnement de la base du labyrinthe (Dimensions et murs extérieurs) '''
 dimension_labyrinthe = Canvas( 
@@ -63,9 +64,8 @@ for y in range(0, hauteur_ecran, taille_cellule):
             dimension_labyrinthe.create_rectangle(
             x, y,
             x + taille_cellule, y + taille_cellule,
-               fill="grey2", outline="darkgrey",      
+               fill="black", outline="darkgrey",      
         ) 
-
 
 ''' Fonction de création des 3 types de cases du labyrinthe '''
 def création_des_trois_types_de_terrain(terrain_à_générer): # fonction pour dessiner les cases murs et les cases sols
@@ -73,13 +73,13 @@ def création_des_trois_types_de_terrain(terrain_à_générer): # fonction pour 
         dimension_labyrinthe.create_rectangle(
             mursx, mursy,
             mursx + taille_cellule, mursy + taille_cellule,
-            fill="ivory4", outline="darkgrey", 
+            fill="gold3", outline="darkgrey", 
         ) 
     elif terrain_à_générer == 1: # objets/pièges
         dimension_labyrinthe.create_rectangle(
             mursx, mursy,
             mursx + taille_cellule, mursy + taille_cellule,
-            fill="purple", outline="darkgrey", 
+            fill="gold4", outline="darkgrey", 
         ) 
     else: # murs
         dimension_labyrinthe.create_rectangle(
@@ -113,12 +113,12 @@ for mursx in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule)
         dimension_labyrinthe.create_rectangle( 
             entree, 0,
             entree + taille_cellule, taille_cellule*2,
-            fill="ivory4", outline="darkgrey",      
+            fill="gold3", outline="darkgrey",      
         ) 
         dimension_labyrinthe.create_rectangle( 
             sortie, hauteur_ecran,
             sortie + taille_cellule, hauteur_ecran-taille_cellule*2,
-            fill="ivory4", outline="darkgrey",      
+            fill="gold3", outline="darkgrey",      
         )
     # Gestion des murs qui peuvent être générés "dans" l'entrée et la sortie
         if [entree, 30] in lc_murs:
@@ -148,6 +148,24 @@ for mursx in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule)
 #             pile.append((nx, ny))
 #         else:
 #             pile.pop()
+
+''' Création des boutons '''
+bouton_quitter = Button(
+    fond_fenetre, 
+    text="Quitter", 
+    command=fenetre_jeu.quit,
+    font=("Kristen ITC", 16, "bold"),
+    bg="darkgoldenrod", 
+    fg="black",
+    relief="raised",
+    borderwidth=5,
+    padx=2,
+    pady=2
+)
+bouton_quitter.place(relx=0.998, rely=0.04, anchor="e")
+fond_fenetre.pack(expand=True, fill="both")
+
+
 
 '''--------- INSERTION ET DEPLACEMENT DU PERSONNAGE ---------'''
 
@@ -193,4 +211,5 @@ fenetre_jeu.bind("<Up>", deplacement_personnage)
 fenetre_jeu.bind("<Down>", deplacement_personnage)
 fenetre_jeu.bind("<Left>", deplacement_personnage)
 fenetre_jeu.bind("<Right>", deplacement_personnage)  
+
 fenetre_jeu.mainloop()
