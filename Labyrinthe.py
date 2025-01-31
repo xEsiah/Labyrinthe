@@ -2,57 +2,44 @@ from tkinter import *
 import random
 
 
-""" VARIABLES """
+"""--------- VARIABLES ---------"""
+
 
 largeur_ecran = 900
 hauteur_ecran = 900
 taille_cellule = 30
-entree_random = [90,180,330,480,840] # Pour pouvoir plus tard définir l'entrée aléatoirement
-sortie_random = [90,180,330,480,840] # Pour pouvoir plus tard définir la sortie aléatoirement
 
+ouvertures = [90,180,270,360,840] # Pour pouvoir définir l'entrée et la sortie
+entree = random.choice(ouvertures) 
+sortie = random.choice(ouvertures)
 
-""" DICTIONNAIRES ET LISTES """
+"""--------- DICTIONNAIRES ET LISTES ---------"""
 
 
 dictionnaire_pieges = [["Piques"],["Trappes"],["Pièges à ours"],["Flèches empoisonnées"],["Plaques piégées"]]
 dictionnaire_coffres = [["Carte"], ["Potion de soin"], ["Plaque d'armure"]]
 liste_evenements = []
 case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
-personnage = {
+inventaire_du_personnage = {
     "Points de vie": 10,
     "Rapidité": 0,
     "Vision": 0,
     "Plaque d'armure" : 0,
     "Potion de soin" : 0,
 }
-lc_murs = [[0, 0], [0, 30], [0, 60], [0, 90], [0, 120], [0, 150], [0, 180], [0, 210], 
- [0, 240], [0, 270], [0, 300], [0, 330], [0, 360], [0, 390], [0, 420], [0, 450], 
- [0, 480], [0, 510], [0, 540], [0, 570], [0, 600], [0, 630], [0, 660], [0, 690], 
- [0, 720], [0, 750], [0, 780], [0, 810], [0, 840], [0, 870], [0, 900],[0, 0], [30, 0], [60, 0], [90, 0], [120, 0], [150, 0], [180, 0], [210, 0], 
- [240, 0], [270, 0], [300, 0], [330, 0], [360, 0], [390, 0], [420, 0], [450, 0], 
- [480, 0], [510, 0], [540, 0], [570, 0], [600, 0], [630, 0], [660, 0], [690, 0], 
- [720, 0], [750, 0], [780, 0], [810, 0], [840, 0], [870, 0], [900, 0],[900, 0], [900, 30], [900, 60], [900, 90], [900, 120], [900, 150], 
- [900, 180], [900, 210], [900, 240], [900, 270], [900, 300], [900, 330], 
- [900, 360], [900, 390], [900, 420], [900, 450], [900, 480], [900, 510], 
- [900, 540], [900, 570], [900, 600], [900, 630], [900, 660], [900, 690], 
- [900, 720], [900, 750], [900, 780], [900, 810], [900, 840], [900, 870], 
- [900, 900],[0, 900], [30, 900], [60, 900], [90, 900], [120, 900], [150, 900], 
- [180, 900], [210, 900], [240, 900], [270, 900], [300, 900], [330, 900], 
- [360, 900], [390, 900], [420, 900], [450, 900], [480, 900], [510, 900], 
- [540, 900], [570, 900], [600, 900], [630, 900], [660, 900], [690, 900], 
- [720, 900], [750, 900], [780, 900], [810, 900], [840, 900], [870, 900], 
- [900, 900]]
+lc_murs = [[0, y] for y in range(0, 901, taille_cellule)] + [[x, 0] for x in range(0, 901, taille_cellule)] + [[870, y] for y in range(0, 901, taille_cellule)] + [[x, 900] for x in range(0, 901, taille_cellule)]  # murs extérieurs du labyrinthe
 
 
-''' FONCTIONS & PROGRAMMES '''
+'''--------- FONCTIONS & PROGRAMMES ---------'''
 
-# Création et paramétrage de la fenètre
+
+''' Création et paramétrage de la fenètre '''
 fenetre_jeu = Tk()
 fenetre_jeu.attributes("-fullscreen", True)
 fenetre_jeu.title("Labyrinthe")
 fond_fenetre = Frame(
     fenetre_jeu,
-    background="orangered4",
+    background="thistle4",
     border= 10,
     relief="sunken",
 )
@@ -60,7 +47,6 @@ fond_fenetre.pack(fill=BOTH, expand=True)
 
 
 ''' Création et positionnement de la base du labyrinthe (Dimensions et murs extérieurs) '''
-
 dimension_labyrinthe = Canvas( 
     fenetre_jeu,
     width=largeur_ecran,
@@ -70,28 +56,24 @@ dimension_labyrinthe = Canvas(
        relief="sunken",
 )
 dimension_labyrinthe.place(relx=0.5, rely=0.5, anchor=CENTER) # Placement du labyrinthe au centre de la fenètre 
-    
+
 for y in range(0, hauteur_ecran, taille_cellule):  # y = lignes
     for x in range(0, largeur_ecran, taille_cellule):  # x = colonnes
         if x == 0 or x == largeur_ecran-taille_cellule or y == 0 or y == hauteur_ecran-taille_cellule:
             dimension_labyrinthe.create_rectangle(
             x, y,
             x + taille_cellule, y + taille_cellule,
-               fill="gray3", outline="gray33",      
+               fill="grey2", outline="darkgrey",      
         ) 
 
-entree = random.choice(entree_random)
-sortie = random.choice(sortie_random)
 
-
-''' Creation murs intérieurs (randomisées) et cases sols dont cases objets '''
-
-def dessin_des_trois_types_de_terrain(terrain_à_générer): # fonction pour dessiner les cases murs et les cases sols
+''' Fonction de création des 3 types de cases du labyrinthe '''
+def création_des_trois_types_de_terrain(terrain_à_générer): # fonction pour dessiner les cases murs et les cases sols
     if terrain_à_générer == 0: # sols
         dimension_labyrinthe.create_rectangle(
             mursx, mursy,
             mursx + taille_cellule, mursy + taille_cellule,
-            fill="white", outline="darkgrey", 
+            fill="ivory4", outline="darkgrey", 
         ) 
     elif terrain_à_générer == 1: # objets/pièges
         dimension_labyrinthe.create_rectangle(
@@ -103,99 +85,92 @@ def dessin_des_trois_types_de_terrain(terrain_à_générer): # fonction pour des
         dimension_labyrinthe.create_rectangle(
             mursx, mursy,
             mursx + taille_cellule, mursy + taille_cellule,
-            fill="black", outline="darkgrey", 
-        )
-    return 
+            fill="grey2", outline="darkgrey", 
+        ) 
     
+''' Fonction de generation aléatoire des cases du terrain (fait appel à la fonction de création des cases) '''  
 def generation_terrain(nombre_aléatoire,x,y,mystere): # fonction pour déterminer les probabilité de générer une case mur ou une case sol
     global lc_murs
-    if nombre_aléatoire <= 51: # sols
-        dessin_des_trois_types_de_terrain(0)
-    elif nombre_aléatoire >= 52 and nombre_aléatoire < 60: # objets/pièges
-        dessin_des_trois_types_de_terrain(1)
+    if nombre_aléatoire <= 4: # sols
+        création_des_trois_types_de_terrain(0)
+    elif nombre_aléatoire > 5 and nombre_aléatoire < 7: # objets/pièges
+        création_des_trois_types_de_terrain(1)
         # randomizer les pieges et le nombre 
         choix_case_mystere = random.choice(mystere)
         random.shuffle(choix_case_mystere)
     else: # murs
-        dessin_des_trois_types_de_terrain(2)
+        création_des_trois_types_de_terrain(2)
         lc_murs.append([x,y])
     return lc_murs
 
-for mursx in range(30, hauteur_ecran-30, taille_cellule):  # y = lignes
-    for mursy in range(30, largeur_ecran-30, taille_cellule):  # x = colonnes
-        nombre = random.randint(0,100)
-        generation_terrain(nombre, mursx, mursy,case_mystere)
-        dimension_labyrinthe.create_rectangle( # configuration entree
+''' Appel de la fonction de génération de terrain sur la grille du labyrinthe (grille située entre les 4 murs donc double parcours) '''
+for mursx in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule):  
+    for mursy in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule): 
+    # Gestion des probabilités de génération et appel de la fonction
+        nombre = random.randint(0,10) 
+        generation_terrain(nombre, mursx, mursy,case_mystere)       
+    # Dessin de l'entrée et de la sortie sur 2 cases (voir entree_random & sortie_random)
+        dimension_labyrinthe.create_rectangle( 
             entree, 0,
             entree + taille_cellule, taille_cellule*2,
-            fill="white", outline="darkgrey",      
-        )
-        dimension_labyrinthe.create_rectangle( # configuration sortie
+            fill="ivory4", outline="darkgrey",      
+        ) 
+        dimension_labyrinthe.create_rectangle( 
             sortie, hauteur_ecran,
             sortie + taille_cellule, hauteur_ecran-taille_cellule*2,
-            fill="white", outline="darkgrey",      
+            fill="ivory4", outline="darkgrey",      
         )
+    # Gestion des murs qui peuvent être générés "dans" l'entrée et la sortie
+        if [entree, 30] in lc_murs:
+            lc_murs.remove([entree, 30]) # Vide la case entrée+1 de la liste des murs
+        elif [sortie, 870] in lc_murs: 
+            lc_murs.remove([sortie, 870]) # Permettre au joueur d'aller sur la case sortie pour valider la victoire, pas de réciproque sur l'entrée pour bloquer le joueur
+        elif [sortie, 840] in lc_murs: 
+            lc_murs.remove([sortie, 840]) # Vide la case sortie-1 de la liste des murs
 
 
-''' Fonction pour insérer et déplacer le personnage dans le labyrinthe '''
+'''--------- INSERTION ET DEPLACEMENT DU PERSONNAGE ---------'''
 
+
+''' Design du personnage et position de départ '''
 personnage = dimension_labyrinthe.create_rectangle(
-    entree + 5, 5,  # Départ légèrement à l'intérieur de l'entrée
+    entree + 5, 5,  
     entree + taille_cellule - 5, taille_cellule - 5,
+    # Réduction et centrage du personnage par rapport à tailles_cellules
     fill="aqua", outline="black"
 )
 
 def deplacement_personnage(event):
-    x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
-    nouveauX, nouveauY = int(x1), int(y1)
+    x1, y1, _, _ = dimension_labyrinthe.coords(personnage)
+    dx, dy = 0, 0
+    
     if event.keysym == "Up":
-        nouveauY -= taille_cellule
-        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
-        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
-        nouvellescoord = [int(x1)-5, int(y1)-5]
-        if nouvellescoord in lc_murs:
-            dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1 + taille_cellule)
-     
+        dy = -taille_cellule
+
     elif event.keysym == "Down":
-        nouveauY += taille_cellule
-        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
-        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
-        nouvellescoord = [int(x1)-5, int(y1)-5]
-        if nouvellescoord in lc_murs:
-            dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1 - taille_cellule) 
-            
+        dy = taille_cellule
+
     elif event.keysym == "Left":
-        nouveauX -= taille_cellule
-        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
-        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
-        nouvellescoord = [int(x1)-5, int(y1)-5]
-        if nouvellescoord in lc_murs:
-            dimension_labyrinthe.move(personnage, nouveauX - x1 + taille_cellule, nouveauY - y1)
-        
+        dx = -taille_cellule
+
     elif event.keysym == "Right":
-        nouveauX += taille_cellule
-        dimension_labyrinthe.move(personnage, nouveauX - x1, nouveauY - y1)
-        x1, y1, x2, y2 = dimension_labyrinthe.coords(personnage)
-        nouvellescoord = [int(x1)-5, int(y1)-5]
-        if nouvellescoord in lc_murs:
-            dimension_labyrinthe.move(personnage, nouveauX - x1 - taille_cellule, nouveauY - y1) 
-
+        dx = taille_cellule
+    dimension_labyrinthe.itemconfig(personnage, fill="aqua")
+    dimension_labyrinthe.move(personnage, dx, dy)
+    
+    x1, y1, _, _ = dimension_labyrinthe.coords(personnage)
+    nouvelles_coord = [int(x1) - 5, int(y1) - 5]
+    if nouvelles_coord in lc_murs:
+        dimension_labyrinthe.itemconfig(personnage, fill="red")
+        dimension_labyrinthe.move(personnage, -dx, -dy)
+    # if nouvelles_coord == [sortie, 840]:
+    #     print('you won')
+        
    
-   
-   
-
-""" APPELS FONCTIONS """
-
+"""--------- APPELS FONCTIONS ---------"""
 
 fenetre_jeu.bind("<Up>", deplacement_personnage)
 fenetre_jeu.bind("<Down>", deplacement_personnage)
 fenetre_jeu.bind("<Left>", deplacement_personnage)
 fenetre_jeu.bind("<Right>", deplacement_personnage)  
-print(lc_murs)
 fenetre_jeu.mainloop()
-
-
-# x1 + taille_cellule = verif droite
-# x1 - taille _cellule + verif gauche
-# y1 + taille_cellule = verif bas
-# y1 - taille_cellule = verif haut
