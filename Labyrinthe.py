@@ -57,8 +57,8 @@ dimension_labyrinthe = Canvas(
 )
 dimension_labyrinthe.place(relx=0.5, rely=0.5, anchor=CENTER) # Placement du labyrinthe au centre de la fenètre 
 
-for y in range(0, hauteur_ecran, taille_cellule):  # y = lignes
-    for x in range(0, largeur_ecran, taille_cellule):  # x = colonnes
+for y in range(0, hauteur_ecran, taille_cellule):
+    for x in range(0, largeur_ecran, taille_cellule): 
         if x == 0 or x == largeur_ecran-taille_cellule or y == 0 or y == hauteur_ecran-taille_cellule:
             dimension_labyrinthe.create_rectangle(
             x, y,
@@ -128,6 +128,26 @@ for mursx in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule)
         elif [sortie, 840] in lc_murs: 
             lc_murs.remove([sortie, 840]) # Vide la case sortie-1 de la liste des murs
 
+# def voisins(x, y):
+#     """Retourne les voisins valides pour le creusement."""
+#     directions = [(0, -2), (0, 2), (-2, 0), (2, 0)]
+#     random.shuffle(directions)
+#     return [(x+dx, y+dy, x+dx//2, y+dy//2) for dx, dy in directions if 0 <= x+dx < largeur and 0 <= y+dy < hauteur and labyrinthe[y+dy][x+dx] == 1]
+
+# def generer_labyrinthe(x, y):
+#     """Génère un labyrinthe parfait en creusant des chemins."""
+#     labyrinthe[y][x] = 0
+#     pile = [(x, y)]
+#     while pile:
+#         cx, cy = pile[-1]
+#         voisins_valides = voisins(cx, cy)
+#         if voisins_valides:
+#             nx, ny, mx, my = voisins_valides[0]
+#             labyrinthe[my][mx] = 0
+#             labyrinthe[ny][nx] = 0
+#             pile.append((nx, ny))
+#         else:
+#             pile.pop()
 
 '''--------- INSERTION ET DEPLACEMENT DU PERSONNAGE ---------'''
 
