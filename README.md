@@ -13,3 +13,7 @@ https://www-geeksforgeeks-org.translate.goog/how-to-create-full-screen-window-in
 https://waytolearnx.com/2020/07/la-methode-place-tkinter-python-3.html
 
 https://wiki.tcl-lang.org/page/Colors+with+Names
+
+https://www.pythontutorial.net/tkinter/tkinter-notebook/
+
+https://docs.python.org/3/library/tkinter.messagebox.html
