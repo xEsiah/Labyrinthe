@@ -55,7 +55,7 @@ bouton_quitter = Button(
     padx=2,
     pady=2
 )
-bouton_quitter.place(relx=0.97, rely=0.03, anchor=CENTER)
+bouton_quitter.place(relx=0.96, rely=0.04, anchor=CENTER)
 
 
 """--------- DICTIONNAIRES ET LISTES ---------"""
@@ -117,13 +117,13 @@ def generation_terrain(nombre_aléatoire,x,y): # Fonction pour déterminer les p
     global lc_murs
     global lc_mystere
     
-    if nombre_aléatoire <= 70: # Sols
+    if nombre_aléatoire > 0 and nombre_aléatoire <= 10: # Objets/Pièges
+        création_des_trois_types_de_terrain(1) 
+        lc_mystere.append([x,y])
+          
+    elif nombre_aléatoire > 10 and nombre_aléatoire <= 80: # Sols
         création_des_trois_types_de_terrain(0)
         lc_sols.append([x,y])
-        
-    elif nombre_aléatoire > 90 and nombre_aléatoire <= 100: # objets/pièges
-        création_des_trois_types_de_terrain(1)
-        lc_mystere.append([x,y])
         
     else: # Murs
         création_des_trois_types_de_terrain(2)
@@ -136,11 +136,12 @@ def generation_terrain(nombre_aléatoire,x,y): # Fonction pour déterminer les p
 for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
     for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
 
-        generation_terrain(70, positionX, positionY) # Première génération du terrain (Très haute probabilité de murs)
-        
+        nombre = random.randint(0,80)
+        generation_terrain(nombre, positionX, positionY) # Première génération du terrain (Très haute probabilité de murs)
+
         couches = [30, 90, 150, 210, 270, 330, 390, 480, 540, 600, 660, 720, 780, 840]
         if [positionX, positionY] in lc_sols:
-            nombre = random.randint(50, 100)
+            nombre = random.randint(60, 100)
             if positionX in couches or positionY in couches:
                 generation_terrain(nombre, positionX, positionY)
 
