@@ -1,7 +1,6 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import random
-from collections import deque
 
 
 def Labyrinthe():
@@ -12,7 +11,6 @@ def Labyrinthe():
     fenetre_jeu = Tk()
     fenetre_jeu.attributes("-fullscreen", True)
     fenetre_jeu.title("Labyrinthe")
-    fenetre_jeu.option_add('*Dialog.msg.font', 'Kristen ITC", 16, "bold"')
     
     
     fond_fenetre = Frame(
@@ -264,29 +262,19 @@ def Labyrinthe():
                     alerteLabel.pack(expand=True)
                     alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
                     if mystere[itn] in dictionnaire_coffres: # Personalisation du message si rencontre d'un bonus
-                        bonne_nouvelle = Toplevel(fenetre)
-                        bonne_nouvelle.configure(bg="grey25")
-                        bonne_nouvelle.geometry("450x100+10+20")
-                        bn_label = Label(bonne_nouvelle, text=f"{nombre_d_objets} {mystere[itn]}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-                        bn_label.pack(expand=True)
-                        bonne_nouvelle.after(2500, bonne_nouvelle.destroy)
+                        afficher_evenements(fenetre, nombre_d_objets, mystere[itn])
                     else: # Personalisation du message si rencontre d'un malus
-                        mavuaise_nouvelle = Toplevel(fenetre)
-                        mavuaise_nouvelle.configure(bg="grey25")
-                        mavuaise_nouvelle.geometry("450x100+10+20")
-                        mn_label = Label(mavuaise_nouvelle, text=f"{nombre_d_objets} {mystere[itn]}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-                        mn_label.pack(expand=True)
-                        mavuaise_nouvelle.after(2500, mavuaise_nouvelle.destroy) 
+                        afficher_evenements(fenetre, nombre_d_objets, mystere[itn])
 
 
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
             fin_du_niveau = Toplevel(fenetre)
             fin_du_niveau.configure(bg="grey25")
-            fin_du_niveau.geometry("650x200+625+400") # Positionne les alertes en haut à gauche
-            alerteLabel = Label(fin_du_niveau, text="FELICITATION \nVOUS ÊTES PARVENUS A LA FIN DU LABYRINTHE", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            fin_du_niveau.geometry("800x780+552+137") # Positionne les alertes en haut à gauche
+            alerteLabel = Label(fin_du_niveau, text="FELICITATIONS !\n\nVOUS ÊTES PARVENUS... \n...À LA FIN DU LABYRINTHE!", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
             alerteLabel.pack(expand=True)
-            fin_du_niveau.after(5000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+            fin_du_niveau.after(100000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
 
 
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
@@ -302,6 +290,14 @@ def Labyrinthe():
     fenetre_jeu.mainloop()
     return 
 
+def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
+    evenement = Toplevel(fenetre)
+    evenement.configure(bg="grey25")
+    evenement.geometry("450x100+10+20")
+    bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+    bn_label.pack(expand=True)
+    
+    evenement.after(2500, evenement.destroy)
 
 def rejouer(fenetre):
     fenetre.destroy() 
