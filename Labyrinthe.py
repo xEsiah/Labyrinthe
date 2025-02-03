@@ -27,9 +27,10 @@ def Labyrinthe():
     hauteur_ecran = 900
     taille_cellule = 30
 
-    ouvertures = [120,180,270,420,780] # Pour pouvoir définir l'entrée et la sortie
-    entree = random.choice(ouvertures) 
-    sortie = random.choice(ouvertures)
+    ouvertures_entree = [120,180,270,420,780] # Pour pouvoir définir l'entrée et la sortie
+    entree = random.choice(ouvertures_entree)
+    ouvertures_sortie = [90,150,240,390,750]
+    sortie = random.choice(ouvertures_sortie)
 
 
     ''' Création et positionnement de la base du labyrinthe '''
@@ -63,7 +64,7 @@ def Labyrinthe():
         padx=1,
         pady=1
     )
-    bouton_quitter.place(relx=0.97, rely=0.05, anchor=CENTER)
+    bouton_quitter.place(relx=0.97, rely=0.06, anchor=CENTER)
 
     
     bouton_rejouer = Button(
@@ -77,7 +78,7 @@ def Labyrinthe():
         padx=1,
         pady=1
     )
-    bouton_rejouer.place(relx=0.91, rely=0.05, anchor=CENTER)
+    bouton_rejouer.place(relx=0.91, rely=0.06, anchor=CENTER)
     
     
     """--------- DICTIONNAIRES ET LISTES ---------"""
@@ -178,18 +179,19 @@ def Labyrinthe():
 
 
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie '''
-    if [entree, 30] in lc_murs or [sortie, 874] in lc_murs or [sortie, 870] in lc_murs or [entree, 30] in lc_mystere or [sortie, 870] in lc_mystere:
-        if [entree, 30] in lc_murs:
-            lc_murs.remove([entree, 30])  # Vide la case entrée+1 de la liste des murs
-        elif [sortie, 840] in lc_murs:
-            lc_murs.remove([sortie, 840])  # Vide la case sortie-1 de la liste des murs
-        elif [sortie, 870] in lc_murs:
-            lc_murs.remove([sortie, 870])  # Permettre au joueur d'aller sur la case sortie
-        elif [entree, 30] in lc_mystere:
-            lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères
-        elif [sortie, 870] in lc_mystere:
-            lc_mystere.remove([sortie, 870])  # Vide la case sortie de la liste des cases mystères
-
+    if [entree, 30] in lc_murs:
+        lc_murs.remove([entree, 30])  # Vide la case entrée+1 de la liste des murs
+    if [entree, 30] in lc_mystere:
+        lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères     
+    if [sortie, 840] in lc_murs:
+        lc_murs.remove([sortie, 840])  # Vide la case sortie-1 de la liste des murs  
+    if [sortie, 870] in lc_murs:
+        lc_murs.remove([sortie, 870])  # Permettre au joueur d'aller sur la case sortie
+    if [sortie, 840] in lc_mystere:
+        lc_mystere.remove([sortie, 840])
+    if [sortie, 870] in lc_mystere:
+        lc_mystere.remove([sortie, 870])  # Vide la case sortie de la liste des cases mystères
+    
 
     '''--------- INSERTION ET DEPLACEMENT DU PERSONNAGE ---------'''
 
@@ -269,12 +271,11 @@ def Labyrinthe():
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
             fin_du_niveau = Toplevel(fenetre)
             fin_du_niveau.configure(bg="grey25")
-            fin_du_niveau.geometry("450x100+10+20") # Positionne les alertes en haut à gauche
-            alerteLabel = Label(fin_du_niveau, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            fin_du_niveau.geometry("650x200+625+400") # Positionne les alertes en haut à gauche
+            alerteLabel = Label(fin_du_niveau, text="FELICITATION \nVOUS ÊTES PARVENUS A LA FIN DU LABYRINTHE", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
             alerteLabel.pack(expand=True)
-            fin_du_niveau.after(1200, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
-            fin_du_niveau.pack(expand=True)
             fin_du_niveau.after(5000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+            
 
 
 
