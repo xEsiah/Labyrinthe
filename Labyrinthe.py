@@ -64,10 +64,10 @@ def Labyrinthe():
         fg="black",
         relief="raised",
         borderwidth=5,
-        padx=2,
-        pady=2
+        padx=1,
+        pady=1
     )
-    bouton_quitter.place(relx=0.96, rely=0.04, anchor=CENTER)
+    bouton_quitter.place(relx=0.97, rely=0.05, anchor=CENTER)
 
     
     bouton_rejouer = Button(
@@ -82,7 +82,7 @@ def Labyrinthe():
         padx=1,
         pady=1
     )
-    bouton_rejouer.place(relx=0.96, rely=0.12, anchor=CENTER)
+    bouton_rejouer.place(relx=0.91, rely=0.05, anchor=CENTER)
     
     
     """--------- DICTIONNAIRES ET LISTES ---------"""
