@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import random
+from collections import deque
 
 
 def Labyrinthe():
@@ -154,15 +155,17 @@ def Labyrinthe():
     for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
         for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
 
-            nombre = random.randint(2,80)
-            generation_terrain(nombre, positionX, positionY) # Première génération du terrain (Très haute probabilité de sol)
+            nombre = random.randint(0,80)
+            generation_terrain(nombre, positionX, positionY) # Première génération du terrain (Très haute probabilité de murs)
 
-            couches = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840]
+            couches = [30, 90, 150, 210, 270, 330, 390, 420, 480, 540, 600, 660, 720, 780, 840]
             if [positionX, positionY] in lc_sols:
-                nombre = random.randint(60, 100)
+                nombre = random.randint(59, 100)
                 if positionX in couches or positionY in couches:
-                    nombre = random.randint(60, 100)
                     generation_terrain(nombre, positionX, positionY)
+
+
+ 
 
                         
     ''' Gestion de l'entré et de la sortie '''       
@@ -181,19 +184,30 @@ def Labyrinthe():
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie '''
     if [entree, 30] in lc_murs:
         lc_murs.remove([entree, 30])  # Vide la case entrée+1 de la liste des murs
+
+    if [entree, 60] in lc_murs and [entree-30, 30] in lc_murs and [entree+30, 30] in lc_murs: # Si l'entrée est bloquée le jeu recommence
+        rejouer(fenetre_jeu)
+
     if [entree, 30] in lc_mystere:
         lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères     
+
     if [sortie, 840] in lc_murs:
         lc_murs.remove([sortie, 840])  # Vide la case sortie-1 de la liste des murs  
+
+    if [sortie, 810] in lc_murs and [sortie-30, 840] in lc_murs and [sortie+30, 840] in lc_murs: # Si la sortie est bloquée le jeu recommence
+        rejouer(fenetre_jeu)
+
     if [sortie, 870] in lc_murs:
         lc_murs.remove([sortie, 870])  # Permettre au joueur d'aller sur la case sortie
+
     if [sortie, 840] in lc_mystere:
         lc_mystere.remove([sortie, 840])
+
     if [sortie, 870] in lc_mystere:
         lc_mystere.remove([sortie, 870])  # Vide la case sortie de la liste des cases mystères
-    
 
-    '''--------- INSERTION ET DEPLACEMENT DU PERSONNAGE ---------'''
+    
+    '''--------- INSERTION DU PERSONNAGE ---------'''
 
 
     ''' Design du personnage et position de départ '''
@@ -275,8 +289,6 @@ def Labyrinthe():
             alerteLabel = Label(fin_du_niveau, text="FELICITATION \nVOUS ÊTES PARVENUS A LA FIN DU LABYRINTHE", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
             alerteLabel.pack(expand=True)
             fin_du_niveau.after(5000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
-            
-
 
 
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
@@ -288,11 +300,13 @@ def Labyrinthe():
     fenetre_jeu.bind("<Right>", deplacement_personnage)  
     # Insérer
 
-    def rejouer(fenetre):
-        fenetre.destroy() 
-        Labyrinthe()
 
     fenetre_jeu.mainloop()
     return 
+
+
+def rejouer(fenetre):
+    fenetre.destroy() 
+    Labyrinthe()
    
 Labyrinthe()
