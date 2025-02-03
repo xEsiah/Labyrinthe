@@ -1,11 +1,6 @@
 from tkinter import *
-from tkinter import messagebox
 from PIL import ImageTk, Image
 import random
-
-def rejouer(fenetre):
-    fenetre.destroy() 
-    Labyrinthe()
 
 
 def Labyrinthe():
@@ -15,7 +10,9 @@ def Labyrinthe():
     fenetre_jeu = Tk()
     fenetre_jeu.attributes("-fullscreen", True)
     fenetre_jeu.title("Labyrinthe")
-
+    fenetre_jeu.option_add('*Dialog.msg.font', 'Kristen ITC", 16, "bold"')
+    
+    
     fond_fenetre = Frame(
         fenetre_jeu,
         background="grey12",
@@ -30,7 +27,7 @@ def Labyrinthe():
     hauteur_ecran = 900
     taille_cellule = 30
 
-    ouvertures = [120,180,270,360,810] # Pour pouvoir définir l'entrée et la sortie
+    ouvertures = [120,180,270,420,780] # Pour pouvoir définir l'entrée et la sortie
     entree = random.choice(ouvertures) 
     sortie = random.choice(ouvertures)
 
@@ -49,10 +46,10 @@ def Labyrinthe():
 
     ''' Création des boutons '''
     # Importation d'images pour illustrer les boutons
-    image_importee2 =  Image.open("ressources\Porte.png")
+    image_importee2 =  Image.open("Labyrinthe/ressources/Quitter.png")
     image_porte = ImageTk.PhotoImage(image_importee2)
     
-    image_importee3 = Image.open("ressources\Rejouer.png")
+    image_importee3 = Image.open("Labyrinthe/ressources/Rejouer.png")
     image_rejouer = ImageTk.PhotoImage(image_importee3)
     
     bouton_quitter = Button(
@@ -60,8 +57,7 @@ def Labyrinthe():
         image= image_porte, 
         command=fenetre_jeu.destroy,
         font=("Kristen ITC", 16, "bold"),
-        bg="darkgoldenrod", 
-        fg="black",
+        bg="grey75", 
         relief="raised",
         borderwidth=5,
         padx=1,
@@ -75,8 +71,7 @@ def Labyrinthe():
         image= image_rejouer,
         command= lambda: rejouer(fenetre_jeu),
         font=("Kristen ITC", 16, "bold"),
-        bg="darkgoldenrod", 
-        fg="black",
+        bg="grey75", 
         relief="raised",
         borderwidth=5,
         padx=1,
@@ -88,9 +83,9 @@ def Labyrinthe():
     """--------- DICTIONNAIRES ET LISTES ---------"""
 
 
-    ''' Initialisation des listes des objets et des cases '''
-    dictionnaire_pieges = ["Pique(s)","Trappe(s)","Piège(s) à ours","Flèche(s) empoisonnée(s)"]
-    dictionnaire_coffres = ["Carte(s)", "Potion(s) de soin", "Plaque(s) d armure"]
+    ''' Initialisation des listes d'objets et de celles des cases '''
+    dictionnaire_pieges = ["PIQUE(S)","TRAPPES(S)","PIÈGE(S) À OURS","FLÈCHE(S) EMPOISONNÈE(S)"]
+    dictionnaire_coffres = ["CARTE(S)", "POTION(S) DE SOIN", "PLAQUE(S) D'ARMURE"]
     lc_mystere = [] # Liste cases mystères
     lc_sols = [] # Liste cases sol
     case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
@@ -158,13 +153,14 @@ def Labyrinthe():
     for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
         for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
 
-            nombre = random.randint(0,80)
-            generation_terrain(nombre, positionX, positionY) # Première génération du terrain (Très haute probabilité de murs)
+            nombre = random.randint(2,80)
+            generation_terrain(nombre, positionX, positionY) # Première génération du terrain (Très haute probabilité de sol)
 
-            couches = [30, 90, 150, 210, 270, 330, 390, 420, 480, 540, 600, 660, 720, 780, 840]
+            couches = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840]
             if [positionX, positionY] in lc_sols:
                 nombre = random.randint(60, 100)
                 if positionX in couches or positionY in couches:
+                    nombre = random.randint(60, 100)
                     generation_terrain(nombre, positionX, positionY)
 
                         
@@ -228,8 +224,8 @@ def Labyrinthe():
         nouvelles_coord = [int(x1) - 5, int(y1) - 5] # Cela facilite la gestion des collisions, des cases objets et de la case de sortie (écran de victoire)
         
         interactions_murs(nouvelles_coord,direction_x,direction_y)
-        interactions_cases_mystère(nouvelles_coord,case_mystere)
-        interactions_sortie(nouvelles_coord,sortie)
+        interactions_cases_mystère(nouvelles_coord,case_mystere,fenetre_jeu)
+        interactions_sortie(nouvelles_coord,sortie,fenetre_jeu)
         print(nouvelles_coord)
 
 
@@ -239,24 +235,47 @@ def Labyrinthe():
             dimension_labyrinthe.itemconfig(personnage, fill="firebrick")
             dimension_labyrinthe.move(personnage, -x, -y)
             
-            
-    def interactions_cases_mystère(coordonnées,mystere):
+        
+    def interactions_cases_mystère(coordonnées,mystere,fenetre):
         nombre_d_objets = random.randint(1,len(mystere))
         mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
         random.shuffle(mystere) # Mélange des indices des items dans la liste
         if coordonnées in lc_mystere:
             for itn in range (len(mystere)):
-                if itn == 0: # Choix au hasard d'un item dans la liste choisie
-                    messagebox.showwarning("OH !","Cette case dissimule...")
+                if itn == 0: # Choix au hasard d'un item dans la liste choisie 
+                    alerte = Toplevel(fenetre)
+                    alerte.configure(bg="grey25")
+                    alerte.geometry("450x100+10+20") # Positionne les alertes en haut à gauche
+                    alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+                    alerteLabel.pack(expand=True)
+                    alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
                     if mystere[itn] in dictionnaire_coffres: # Personalisation du message si rencontre d'un bonus
-                        messagebox.showwarning("SUPER !",(nombre_d_objets,mystere[itn])) 
+                        bonne_nouvelle = Toplevel(fenetre)
+                        bonne_nouvelle.configure(bg="grey25")
+                        bonne_nouvelle.geometry("450x100+10+20")
+                        bn_label = Label(bonne_nouvelle, text=f"{nombre_d_objets} {mystere[itn]}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+                        bn_label.pack(expand=True)
+                        bonne_nouvelle.after(2500, bonne_nouvelle.destroy)
                     else: # Personalisation du message si rencontre d'un malus
-                        messagebox.showwarning("MINCE !",(nombre_d_objets,mystere[itn]))
-                    
-                        
-    def interactions_sortie(coordonnées,fin):
+                        mavuaise_nouvelle = Toplevel(fenetre)
+                        mavuaise_nouvelle.configure(bg="grey25")
+                        mavuaise_nouvelle.geometry("450x100+10+20")
+                        mn_label = Label(mavuaise_nouvelle, text=f"{nombre_d_objets} {mystere[itn]}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+                        mn_label.pack(expand=True)
+                        mavuaise_nouvelle.after(2500, mavuaise_nouvelle.destroy) 
+
+                     
+    def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
-            messagebox.showwarning("FELICITATION", "Vous êtes parvenus au bout du labyrinthe!")
+            fin_du_niveau = Toplevel(fenetre)
+            fin_du_niveau.configure(bg="grey25")
+            fin_du_niveau.geometry("450x100+10+20") # Positionne les alertes en haut à gauche
+            alerteLabel = Label(fin_du_niveau, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            alerteLabel.pack(expand=True)
+            fin_du_niveau.after(1200, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+            fin_du_niveau.pack(expand=True)
+            fin_du_niveau.after(5000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+
 
 
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
@@ -268,11 +287,11 @@ def Labyrinthe():
     fenetre_jeu.bind("<Right>", deplacement_personnage)  
     # Insérer
 
+    def rejouer(fenetre):
+        fenetre.destroy() 
+        Labyrinthe()
 
-        
     fenetre_jeu.mainloop()
     return 
-
-    
+   
 Labyrinthe()
-    
