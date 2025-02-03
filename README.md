@@ -17,3 +17,5 @@ https://wiki.tcl-lang.org/page/Colors+with+Names
 https://www.pythontutorial.net/tkinter/tkinter-notebook/
 
 https://docs.python.org/3/library/tkinter.messagebox.html
+
+https://pillow.readthedocs.io/en/stable/reference/Image.html
