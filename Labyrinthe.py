@@ -7,6 +7,7 @@ from collections import deque
 def Labyrinthe():
     """--------- INITIALISATIONS (fenetres principale, menus et base du labyrinthe) ---------"""
 
+
     ''' Création et paramétrage de la fenètre principale '''
     fenetre_jeu = Tk()
     fenetre_jeu.attributes("-fullscreen", True)
@@ -164,10 +165,7 @@ def Labyrinthe():
                 if positionX in couches or positionY in couches:
                     generation_terrain(nombre, positionX, positionY)
 
-
  
-
-                        
     ''' Gestion de l'entré et de la sortie '''       
     dimension_labyrinthe.create_rectangle( # Dessin de l'entrée sur 2 cases
         entree, 0,
@@ -250,8 +248,8 @@ def Labyrinthe():
         if coordonnées in lc_murs: # Gestion des collisions (changement de couleur si un mur est rencontré et retour à la case d'avant)
             dimension_labyrinthe.itemconfig(personnage, fill="firebrick")
             dimension_labyrinthe.move(personnage, -x, -y)
-            
-        
+
+
     def interactions_cases_mystère(coordonnées,mystere,fenetre):
         nombre_d_objets = random.randint(1,len(mystere))
         mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
@@ -280,7 +278,7 @@ def Labyrinthe():
                         mn_label.pack(expand=True)
                         mavuaise_nouvelle.after(2500, mavuaise_nouvelle.destroy) 
 
-                     
+
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
             fin_du_niveau = Toplevel(fenetre)
