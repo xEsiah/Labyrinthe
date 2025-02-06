@@ -28,9 +28,11 @@ def Labyrinthe():
     taille_cellule = 30
 
     ouvertures_entree = [120,180,270,420,780] # Pour pouvoir définir l'entrée et la sortie
-    entree = random.choice(ouvertures_entree)
     ouvertures_sortie = [90,150,240,390,750]
-    sortie = random.choice(ouvertures_sortie)
+    entree_x = random.choice(ouvertures_entree)
+    sortie_x = random.choice(ouvertures_sortie)
+    entree_y = 30
+    sortie_y = 840
 
 
     ''' Création et positionnement de la base du labyrinthe '''
@@ -47,7 +49,7 @@ def Labyrinthe():
 
     ''' Création des boutons '''
     # Importation d'images pour illustrer les boutons
-    image_importee2 =  Image.open("ressources/Quitter.png")
+    image_importee2 =  Image.open("ressources/Sortie.png")
     image_porte = ImageTk.PhotoImage(image_importee2)
     
     image_importee3 = Image.open("ressources/Rejouer.png")
@@ -89,6 +91,7 @@ def Labyrinthe():
     dictionnaire_coffres = ["CARTE(S)", "POTION(S) DE SOIN", "PLAQUE(S) D'ARMURE"]
     lc_mystere = [] # Liste cases mystères
     lc_sols = [] # Liste cases sol
+    lc_chemin = [] # Liste cases chemin principal
     case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
 
 
@@ -110,104 +113,110 @@ def Labyrinthe():
 
 
     ''' Fonction de création des 3 types de cases du labyrinthe '''
-    def création_des_trois_types_de_terrain(terrain_à_générer): # Fonction pour dessiner les cases murs et les cases sols
+    def création_des_trois_types_de_terrain(terrain_à_générer,x,y): # Fonction pour dessiner les cases murs et les cases sols
         if terrain_à_générer == 0: # murs 
             dimension_labyrinthe.create_rectangle(
-                positionX, positionY,
-                positionX + taille_cellule, positionY + taille_cellule,
+                x, y,
+                x + taille_cellule, y + taille_cellule,
                 fill="grey2", outline="darkgrey", 
             ) 
         elif terrain_à_générer == 1: # sols
             dimension_labyrinthe.create_rectangle(
-                positionX, positionY,
-                positionX + taille_cellule, positionY + taille_cellule,
+                x, y,
+                x + taille_cellule, y + taille_cellule,
                 fill="gold3", outline="darkgrey", 
             ) 
         else: # objets/pièges
             dimension_labyrinthe.create_rectangle(
-                positionX, positionY,
-                positionX + taille_cellule, positionY + taille_cellule,
+                x, y,
+                x + taille_cellule, y + taille_cellule,
                 fill="gold4", outline="darkgrey", 
             ) 
 
 
-    ''' Fonction de generation aléatoire des cases du terrain (fait appel à la fonction de création des cases) '''  
+    ''' Fonction de generation des cases du terrain et de la gestion des listes associées (fait appel à la fonction de création des cases) '''  
     def generation_terrain(nombre_aléatoire,x,y): # Fonction pour déterminer les probabilité de générer une case mur ou une case sol
-        if  nombre_aléatoire >= 0 and nombre_aléatoire <= 45: # Murs
-            création_des_trois_types_de_terrain(0)
-            lc_murs.append([x,y])   
-        elif nombre_aléatoire >= 46 and nombre_aléatoire <= 100: # Sols
-            création_des_trois_types_de_terrain(1) 
+        if nombre_aléatoire <= 0: # Murs
+            création_des_trois_types_de_terrain(0,x,y)
+            if [x,y] not in lc_murs:
+                lc_murs.append([x,y])   
+        elif nombre_aléatoire >= 1 and nombre_aléatoire <= 98: # Sols
+            création_des_trois_types_de_terrain(1,x,y) 
             lc_sols.append([x,y]) 
             if [x,y] in lc_murs:
                 lc_murs.remove([x,y])
         else: # Objets/Pièges
-            création_des_trois_types_de_terrain(2)
+            création_des_trois_types_de_terrain(2,x,y)
             lc_mystere.append([x,y])
             if [x,y] in lc_murs:
                 lc_murs.remove([x,y])
         return lc_murs,lc_sols, lc_mystere
 
 
-    ''' Appel de la fonction de génération de terrain sur la grille du labyrinthe (grille située entre les 4 murs donc double parcours) '''
+    ''' Génération d'un parcours à travers l'abscisse du labyrinthe  '''    
+    chemin_x, chemin_y = entree_x, entree_y  # Départ à l'entrée
+    while chemin_y < sortie_y:  # Tant qu'on n'a pas atteint la couche de la sortie
+        print([chemin_x,chemin_y])
+        lc_chemin.append([chemin_x,chemin_y])
+        generation_terrain(random.randint(98,100), chemin_x, chemin_y)  # Création du chemin (sol)
+        voisins_bas = (chemin_x, chemin_y + taille_cellule)
+        voisins_gauche = (chemin_x - taille_cellule, chemin_y)
+        voisins_droite = (chemin_x + taille_cellule, chemin_y)
+        directions = [voisins_bas, voisins_gauche, voisins_droite] # Liste des directions possibles (pas de direction vers le haut)
+        random.shuffle(directions)  # Mélanger les directions pour plus de variété
+        for prochaine_case_x, prochaine_case_y in directions: # Choisir la prochaine direction
+            if taille_cellule <= prochaine_case_x < largeur_ecran - taille_cellule and taille_cellule <= prochaine_case_y < hauteur_ecran - taille_cellule:
+                chemin_x, chemin_y = prochaine_case_x, prochaine_case_y # Aller à la nouvelle position
+
+
+    ''' Appel de la fonction de génération de terrain sur la grille du labyrinthe pour créer la base en murs '''
     for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
         for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
-            nombre = random.randint(0,45) 
-            generation_terrain(nombre, positionX, positionY) # Première génération du terrain (murs)
-            
-            
-            couchesY = [30, 90, 150, 210, 270, 330, 390, 450, 510, 570, 630, 690, 750, 810, 870]
-            couchesX = [30, 90, 210, 270, 330, 450, 510,  630, 690, 810, 870]
+            if [positionX,positionY] not in lc_chemin:
+                generation_terrain(0, positionX, positionY) # Première génération du terrain (murs)
+            couchesY = [0,60,120,180,240,300,360,420,480,540,600,660,720,780,840]
+            couchesX = [60,120,180,240,300,360,420,480,540,600,660,720,780]
             if positionY in couchesY and positionX in range(30,870):
-                    nombre = random.randint(35,110)
+                    nombre = random.randint(70,90)
                     generation_terrain(nombre, positionX, positionY)
-            # if positionX in couchesX and positionY in range(30,870):
-            #         nombre = random.randint(251,105)
-            #         generation_terrain(nombre, positionX, positionY)
 
-
- 
     ''' Gestion de l'entré et de la sortie '''       
     dimension_labyrinthe.create_rectangle( # Dessin de l'entrée sur 2 cases
-        entree, 0,
-        entree + taille_cellule, taille_cellule*3,
+        entree_x, 0,
+        entree_x + taille_cellule, taille_cellule*2,
         fill="gold3", outline="darkgrey",      
     ) 
     dimension_labyrinthe.create_rectangle( # Dessin de la sortie sur 2 cases
-        sortie, hauteur_ecran,
-        sortie + taille_cellule, hauteur_ecran-taille_cellule*3,
+        sortie_x, hauteur_ecran,
+        sortie_x + taille_cellule, hauteur_ecran-taille_cellule*2,
         fill="gold3", outline="darkgrey",      
     )
 
 
-    ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie '''
-    if [entree, 30] in lc_murs:
-        lc_murs.remove([entree, 30]) 
-    if [entree, 60] in lc_murs: # Vide la case entrée+1 de la liste des murs
-        generation_terrain(79,entree,60)
-    if [entree, 30] in lc_mystere:
-        lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères
-    if [entree, 60] in lc_mystere:
-        lc_mystere.remove([entree, 60])  # Vide la case entrée+1 de la liste des cases mystères
-    # if [sortie, 840] in lc_murs:
-    #     lc_murs.remove([sortie, 840])  # Vide la case sortie-1 de la liste des murs        
-    # if [sortie, 840] in lc_mystere:
-    #     lc_mystere.remove([sortie, 840])  # Vide la case sortie-1 de la liste des cases mystères
-    # if [sortie, 870] in lc_mystere:
-    #     lc_mystere.remove([sortie, 870])  # Vide la case sortie de la liste des cases mystères
-    # if [sortie, 870] in lc_murs:
-    #     lc_murs.remove([sortie, 870])  # Vide la case sortie de la liste des murs     
+    # ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie ''' 
+    # if [entree, 60] in lc_murs: # Vide la case entrée+1 de la liste des murs
+    #     generation_terrain(79,entree,60)
+    # if [entree_x, 30] in lc_mystere:
+    #     lc_mystere.remove([entree_x, 30])  # Vide la case entrée+1 de la liste des cases mystères
+    # if [entree_x, 60] in lc_mystere:
+    #     lc_mystere.remove([entree_x, 60])  # Vide la case entrée+1 de la liste des cases mystères
+    # if [sortie, 810] in lc_murs:
+    #     lc_murs.remove([sortie, 810])  # Vide la case sortie-2 de la liste des murs       
+    # if [sortie_x, 840] in lc_murs:
+    #     lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs        
+    # if [sortie_x, 840] in lc_mystere:
+    #     lc_mystere.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des cases mystères
+    # if [sortie_x, 870] in lc_mystere:
+    #     lc_mystere.remove([sortie_x, 870])  # Vide la case sortie de la liste des cases mystères
+    # if [sortie_x, 870] in lc_murs:
+    #     lc_murs.remove([sortie_x, 870])  # Vide la case sortie de la liste des murs     
      
 # Si l'entrée est bloquée le jeu recommence
-    if [entree, 60] in lc_murs and [entree-30, 30] in lc_murs and [entree+30, 30] in lc_murs: 
-        rejouer(fenetre_jeu)
-    if [entree, 90] in lc_murs and [entree-30, 60] in lc_murs and [entree+60, 30] in lc_murs and [entree-30, 30] in lc_murs and [entree+30, 30] in lc_murs:
-        rejouer(fenetre_jeu)
+#     if [entree, 60] in lc_murs and [entree-30, 30] in lc_murs and [entree+30, 30] in lc_murs: 
+#         rejouer(fenetre_jeu)
   
 # Si la sortie est bloquée le jeu recommence
-    if [sortie, 810] in lc_murs and [sortie-30, 840] in lc_murs and [sortie+30, 840] in lc_murs:
-        rejouer(fenetre_jeu)
-    if [sortie, 780] in lc_murs and [sortie-30, 840] in lc_murs and [sortie+30, 840] in lc_murs and [sortie-30, 810] in lc_murs and [sortie+30, 810] in lc_murs: # Si la sortie est bloquée le jeu recommence
+    if [sortie_x, 810] in lc_murs and [sortie_x-30, 840] in lc_murs and [sortie_x+30, 840] in lc_murs:
         rejouer(fenetre_jeu)
 
 
@@ -219,8 +228,8 @@ def Labyrinthe():
 
     ''' Design du personnage et position de départ '''
     personnage = dimension_labyrinthe.create_rectangle(
-        entree + 5, 5 + taille_cellule,  
-        entree + taille_cellule - 5, taille_cellule - 5 + taille_cellule,
+        entree_x + 5, 5 + taille_cellule,  
+        entree_x + taille_cellule - 5, taille_cellule - 5 + taille_cellule,
         # Réduction et centrage du personnage par rapport à tailles_cellules
         fill="purple", outline="black"
     )
@@ -248,7 +257,7 @@ def Labyrinthe():
         
         interactions_murs(nouvelles_coord,direction_x,direction_y)
         interactions_cases_mystère(nouvelles_coord,case_mystere,fenetre_jeu)
-        interactions_sortie(nouvelles_coord,sortie,fenetre_jeu)
+        interactions_sortie(nouvelles_coord,sortie_x,fenetre_jeu)
         print(nouvelles_coord)
 
 
