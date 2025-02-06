@@ -47,10 +47,10 @@ def Labyrinthe():
 
     ''' Création des boutons '''
     # Importation d'images pour illustrer les boutons
-    image_importee2 =  Image.open("Quitter.png")
+    image_importee2 =  Image.open("ressources/Quitter.png")
     image_porte = ImageTk.PhotoImage(image_importee2)
     
-    image_importee3 = Image.open("Rejouer.png")
+    image_importee3 = Image.open("ressources/Rejouer.png")
     image_rejouer = ImageTk.PhotoImage(image_importee3)
     
     bouton_quitter = Button(
@@ -121,13 +121,13 @@ def Labyrinthe():
             dimension_labyrinthe.create_rectangle(
                 positionX, positionY,
                 positionX + taille_cellule, positionY + taille_cellule,
-                fill="gold4", outline="darkgrey", 
+                fill="gold3", outline="darkgrey", 
             ) 
         else: # objets/pièges
             dimension_labyrinthe.create_rectangle(
                 positionX, positionY,
                 positionX + taille_cellule, positionY + taille_cellule,
-                fill="gold3", outline="darkgrey", 
+                fill="gold4", outline="darkgrey", 
             ) 
 
 
@@ -156,13 +156,13 @@ def Labyrinthe():
             generation_terrain(nombre, positionX, positionY) # Première génération du terrain (murs)
             
             
-            couchesY = [0,60,120,180,240,300,360,420,480,540,600,660,720,780,840]
-            couchesX = [60,120,180,240,300,360,420,480,540,600,660,720,780]
+            couchesY = [30, 90, 150, 210, 270, 330, 390, 450, 510, 570, 630, 690, 750, 810, 870]
+            couchesX = [30, 90, 210, 270, 330, 450, 510,  630, 690, 810, 870]
             if positionY in couchesY and positionX in range(30,870):
-                    nombre = random.randint(70,90)
+                    nombre = random.randint(35,110)
                     generation_terrain(nombre, positionX, positionY)
             # if positionX in couchesX and positionY in range(30,870):
-            #         nombre = random.randint(70,90)
+            #         nombre = random.randint(251,105)
             #         generation_terrain(nombre, positionX, positionY)
 
 
@@ -185,8 +185,10 @@ def Labyrinthe():
         lc_murs.remove([entree, 30]) 
     if [entree, 60] in lc_murs: # Vide la case entrée+1 de la liste des murs
         generation_terrain(79,entree,60)
-    # if [entree, 30] in lc_mystere:
-    #     lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères
+    if [entree, 30] in lc_mystere:
+        lc_mystere.remove([entree, 30])  # Vide la case entrée+1 de la liste des cases mystères
+    if [entree, 60] in lc_mystere:
+        lc_mystere.remove([entree, 60])  # Vide la case entrée+1 de la liste des cases mystères
     # if [sortie, 840] in lc_murs:
     #     lc_murs.remove([sortie, 840])  # Vide la case sortie-1 de la liste des murs        
     # if [sortie, 840] in lc_mystere:
