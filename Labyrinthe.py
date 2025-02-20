@@ -1,7 +1,6 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import random
-import time
 
 
 def Labyrinthe():
@@ -59,7 +58,7 @@ def Labyrinthe():
     bouton_quitter = Button(
         fond_fenetre, 
         image= image_porte, 
-        command=fenetre_jeu.destroy,
+        command= lambda: quitter(fenetre_jeu),
         font=("Kristen ITC", 16, "bold"),
         bg="grey75", 
         relief="raised",
@@ -399,18 +398,8 @@ def Labyrinthe():
             inventaire["POTION(S) DE SOIN"] += nombre
 
         if inventaire["PV"] <= 0: # Condition de GAME OVER  
-            def fermer_et_rejouer():
-                for fenetre_ouverte in fenetre.winfo_children():
-                    if isinstance(fenetre_ouverte, Toplevel):
-                        fenetre_ouverte.destroy()
-                rejouer(fenetre)
-            partie_perdue = Toplevel(fenetre)
-            partie_perdue.configure(bg="grey25")
-            partie_perdue.attributes("-fullscreen", True)
-            partie_perdue = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
-            partie_perdue.pack(expand=True)
-            partie_perdue.after(5000, fermer_et_rejouer)
-            
+            fin_de_partie_defaite(fenetre)  
+   
         mettre_a_jour_stats()    
 
 
@@ -445,7 +434,7 @@ def Labyrinthe():
         destruction_armure.after(2500, destruction_armure.destroy)
 
 
-    def soignement(inventaire, fenetre):
+    def soignement(inventaire, fenetre): # Fonction pour utiliser les potions de soin
         def creation_fenetre_soin(changement_texte): 
             soin = Toplevel(fenetre) # Crée la fenêtre d'événement "soin"
             soin.configure(bg="grey25")
@@ -471,6 +460,21 @@ def Labyrinthe():
             creation_fenetre_soin("IMPOSSIBLE\n\n NOMBRE DE POTION INSUFFISANT")
             
         mettre_a_jour_stats()     
+        
+
+    def fin_de_partie_defaite(fenetre): # Fonction pour perdre la partie
+        def fermer_et_rejouer(fenetre):
+            for fenetre_ouverte in fenetre.winfo_children():
+                if isinstance(fenetre_ouverte, Toplevel):
+                    fenetre_ouverte.destroy()
+                rejouer(fenetre)
+        partie_perdue = Toplevel(fenetre)
+        partie_perdue.configure(bg="grey25")
+        partie_perdue.attributes("-fullscreen", True)
+        partie_perdue = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+        partie_perdue.pack(expand=True)
+        partie_perdue.after(5000, fermer_et_rejouer)
+    
     
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
 
@@ -479,13 +483,17 @@ def Labyrinthe():
     fenetre_jeu.bind("<Left>", deplacement_personnage)
     fenetre_jeu.bind("<Right>", deplacement_personnage)  
     fenetre_jeu.bind("<h>", lambda event: soignement(inventaire_du_personnage, fenetre_jeu))
-
-    # Insérer autres commandes
+    fenetre_jeu.bind("<Escape>", lambda event: quitter(fenetre_jeu))
+    fenetre_jeu.bind("<r>", lambda event: rejouer(fenetre_jeu))
+    fenetre_jeu.bind("<v>", lambda event: interactions_sortie([sortie_x,870],sortie_x,fenetre_jeu))
+    fenetre_jeu.bind("<d>", lambda event: fin_de_partie_defaite(fenetre_jeu))
     fenetre_jeu.mainloop()
-
 
 def rejouer(fenetre):
     fenetre.destroy() 
     Labyrinthe()
-   
+    
+def quitter(fenetre):
+    fenetre.destroy() 
+    
 Labyrinthe()
