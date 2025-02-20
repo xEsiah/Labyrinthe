@@ -97,8 +97,8 @@ def Labyrinthe():
     case_mystere = [dictionnaire_coffres, dictionnaire_pieges] # Réunion de tous les types d'événements
     inventaire_du_personnage = { 
         "PV": 5,
-        "PLAQUE(S) D'ARMURE" : 0,
         "POTION(S) DE SOIN" : 0,
+        "PLAQUE(S) D'ARMURE" : 0,
     }
 
 
@@ -146,7 +146,7 @@ def Labyrinthe():
                 lc_murs.remove([x,y])
             if (x,y) in lc_mystere:
                 del lc_mystere[x,y]
-                
+   
         else: # Objets/Pièges
             création_des_trois_types_de_terrain(2,x,y)
             mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
@@ -225,14 +225,15 @@ def Labyrinthe():
     )
 
     ''' Affichage des status du personnage '''
-    image_importee3 =  Image.open("ressources/Coeur.png")
+    # Importation des icones
+    image_importee3 =  Image.open("ressources/Coeur.png") 
     image_coeur = ImageTk.PhotoImage(image_importee3)
     image_importee4 =  Image.open("ressources/Potion.png")
     image_potion = ImageTk.PhotoImage(image_importee4)
     image_importee5 =  Image.open("ressources/Armure.png")
     image_armure = ImageTk.PhotoImage(image_importee5)
     
-    affichage_nombre_pv = Label(
+    affichage_nombre_pv = Label( # Affichage de la stat PV
     fond_fenetre, 
     text=inventaire_du_personnage["PV"], 
     font=("Kristen ITC", 60, "bold"),
@@ -241,37 +242,38 @@ def Labyrinthe():
     )
     affichage_nombre_pv.place(relx=0.1, rely=0.3)
     
-    affichage_nombre_potion = Label(
-    fond_fenetre, 
-    text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"], 
-    font=("Kristen ITC", 60, "bold"),
-    bg="grey12", 
-    fg="goldenrod"
-    )
-    affichage_nombre_potion.place(relx=0.1, rely=0.5) 
-    
-    affichage_nombre_armure = Label(
+    affichage_nombre_potion = Label( # Affichage de la stat Potion de soin
     fond_fenetre, 
     text=inventaire_du_personnage["POTION(S) DE SOIN"], 
     font=("Kristen ITC", 60, "bold"),
     bg="grey12", 
     fg="goldenrod"
     )
+    affichage_nombre_potion.place(relx=0.1, rely=0.5) 
+    
+    affichage_nombre_armure = Label( # Affichage de la stat Armure
+    fond_fenetre, 
+    text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"], 
+    font=("Kristen ITC", 60, "bold"),
+    bg="grey12", 
+    fg="goldenrod"
+    )
     affichage_nombre_armure.place(relx=0.1, rely=0.7) 
     
-    affichage_nombre_pv_icon = Label(fond_fenetre, image=image_coeur, bg="grey12")
+    
+    affichage_nombre_pv_icon = Label(fond_fenetre, image=image_coeur, bg="grey12") # Affichage de l'icone pour PV
     affichage_nombre_pv_icon.place(relx=0.02, rely=0.3)
 
-    affichage_nombre_potion_icon = Label(fond_fenetre, image=image_potion, bg="grey12")
+    affichage_nombre_potion_icon = Label(fond_fenetre, image=image_potion, bg="grey12") # Affichage de l'icone pour Potions
     affichage_nombre_potion_icon.place(relx=0.02, rely=0.5)
     
-    affichage_nombre_armure_icon = Label(fond_fenetre, image=image_armure, bg="grey12")
+    affichage_nombre_armure_icon = Label(fond_fenetre, image=image_armure, bg="grey12") # Affichage de l'icone pour Armure
     affichage_nombre_armure_icon.place(relx=0.02, rely=0.7)
     
-    def mettre_a_jour_stats():
+    def mettre_a_jour_stats(): 
         affichage_nombre_pv.config(text=inventaire_du_personnage["PV"])
-        affichage_nombre_armure.config(text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"])
         affichage_nombre_potion.config(text=inventaire_du_personnage["POTION(S) DE SOIN"])
+        affichage_nombre_armure.config(text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"])
 
     ''' Deplacement du personnage et évenements '''
     def deplacement_personnage(commande):
@@ -308,7 +310,7 @@ def Labyrinthe():
         coord_tuple = tuple(coordonnées)
         if coord_tuple in mystere:
             nombre, objet = mystere[coord_tuple]
-            afficher_evenements(fenetre,nombre,objet)       
+            afficher_surprise_et_evenements(fenetre,nombre,objet)       
             evenement_cause_par_case_mystere(nombre, objet, inventaire, fenetre)
             x = coord_tuple[0]
             y = coord_tuple[1]
@@ -329,44 +331,54 @@ def Labyrinthe():
             alerteLabel.pack(expand=True)
             fin_du_niveau.after(10000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
 
-    def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
-        affichage_evenement = Toplevel(fenetre)
-        affichage_evenement.configure(bg="grey25")
-        affichage_evenement.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
-        alerteLabel = Label(affichage_evenement, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-        alerteLabel.pack(expand=True)
-        affichage_evenement.after(1200, affichage_evenement.destroy) # Fermeture automatique après le temps choisi
-        if mystere_element not in dictionnaire_pieges or mystere_element == "PIÈGE À OURS" or mystere_element == "ACIDE SULFURIQUE":
+    def afficher_surprise_et_evenements(fenetre, nombre_d_objets, mystere_element): 
+        affichage_surprise = Toplevel(fenetre)
+        affichage_surprise.configure(bg="grey25")
+        affichage_surprise.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
+        texte_surprise = Label(affichage_surprise, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+        texte_surprise.pack(expand=True)
+        affichage_surprise.after(1200, affichage_surprise.destroy) # Fermeture automatique après le temps choisi
+    
+        def afficher_événement(fenetre, remplacement):
             evenement = Toplevel(fenetre)
             evenement.configure(bg="grey25")
             evenement.geometry("420x100+10+160")
-            bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-            bn_label.pack(expand=True)
+            evenement_texte = Label(evenement, text= f"{remplacement} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            evenement_texte.pack(expand=True)
             evenement.after(2500, evenement.destroy)
-        else:
-            evenement = Toplevel(fenetre)
-            evenement.configure(bg="grey25")
-            evenement.geometry("420x100+10+160")
-            bn_label = Label(evenement, text=f"UN(E) {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-            bn_label.pack(expand=True)
-            evenement.after(2500, evenement.destroy)
-            
-                     
+        if mystere_element not in dictionnaire_coffres:
+            if mystere_element != "PIÈGE À OURS" and mystere_element != "ACIDE SULFURIQUE": # Affichage différent pour les objets et pour certains piège
+                afficher_événement(fenetre, "UN(E)")    
+        else: # Affichage pour les autres pièges
+            afficher_événement(fenetre, nombre_d_objets)
+            print("OK")
+
+                  
     '''  Gestion des conséquences des événements sur les statuts du joueur '''   
     def evenement_cause_par_case_mystere(nombre,objet,inventaire, fenetre):
-        if objet == "SALVE DE FLECHE":
+        if objet == "SALVE DE FLECHE": # Enleve 1 point de vie (ou d'armure si armure > 0)
             if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
                 inventaire["PLAQUE(S) D'ARMURE"] -= nombre
             else:
                 inventaire["PV"] -= nombre
-        if objet == "TRAPPE": # Renvoie le personnage à l'entrée
-            dimension_labyrinthe.coords(
-                personnage,
-                entree_x + 5, 35,  
-                entree_x + taille_cellule - 5, taille_cellule + 25
-            )
-            inventaire["PV"] -= 1
-        if objet == "PIÈGE À OURS":
+                
+        if objet == "TRAPPE": # Renvoie le personnage à l'entrée (EASTER EGG: faible chance de l'envoyer à la sortie)
+            easter_egg = random.randint(0, 100)
+            if easter_egg != 99:
+                dimension_labyrinthe.coords(
+                    personnage,
+                    entree_x + 5, 35,  
+                    entree_x + taille_cellule - 5, taille_cellule + 25
+                )
+                inventaire["PV"] -= 1
+            else:
+                dimension_labyrinthe.coords(
+                    personnage,
+                    sortie_x + 5, sortie_y + 5,  
+                    sortie_x + taille_cellule - 5, sortie_y + 25
+                )
+            
+        if objet == "PIÈGE À OURS": # Immoblise pendant quelques secondes 
             immobilisation(fenetre)
             if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
                 inventaire["PLAQUE(S) D'ARMURE"] -= nombre
@@ -374,40 +386,41 @@ def Labyrinthe():
                 inventaire["PV"] -= nombre
                 if inventaire["PV"] <= 0:
                     rejouer(fenetre)
-        if objet == "ACIDE SULFURIQUE": # Idée de dégats en différé
+                    
+        if objet == "ACIDE SULFURIQUE": # Supprime toute l'armure
             destruction_armure(fenetre)
             if inventaire["PLAQUE(S) D'ARMURE"] != 0:
-                inventaire["PLAQUE(S) D'ARMURE"] = 0      
-        if objet == "PLAQUE(S) D'ARMURE":
+                inventaire["PLAQUE(S) D'ARMURE"] = 0 
+
+        if objet == "PLAQUE(S) D'ARMURE" and inventaire["PLAQUE(S) D'ARMURE"] < 4: # Octroie de l'armure (maximum à 4)
             inventaire["PLAQUE(S) D'ARMURE"] += nombre
-        if objet == "POTION(S) DE SOIN" and inventaire["POTION(S) DE SOIN"] < 5:
+
+        if objet == "POTION(S) DE SOIN" and inventaire["POTION(S) DE SOIN"] < 4: # Octroie des potions (maximum à 4)
             inventaire["POTION(S) DE SOIN"] += nombre
 
-        if inventaire["PV"] <= 0: # Condition de GAME OVER
-            
-            partie_perdue = Toplevel(fenetre)
-            partie_perdue.configure(bg="grey25")
-            partie_perdue.attributes("-fullscreen", True)
-            partie_perdue = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
-            partie_perdue.pack(expand=True)
+        if inventaire["PV"] <= 0: # Condition de GAME OVER  
             def fermer_et_rejouer():
                 for fenetre_ouverte in fenetre.winfo_children():
                     if isinstance(fenetre_ouverte, Toplevel):
                         fenetre_ouverte.destroy()
                 rejouer(fenetre)
-            
-            # Fermer la fenêtre GAME OVER après 5 secondes et relancer le jeu
+            partie_perdue = Toplevel(fenetre)
+            partie_perdue.configure(bg="grey25")
+            partie_perdue.attributes("-fullscreen", True)
+            partie_perdue = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+            partie_perdue.pack(expand=True)
             partie_perdue.after(5000, fermer_et_rejouer)
+            
         mettre_a_jour_stats()    
 
 
-    def immobilisation(fenetre):  
+    def immobilisation(fenetre): # Fonction pour afficher le statut d'immobilisation lorsque le joueur rencontre piège à ours 
         immobilisation = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
         immobilisation.configure(bg="grey25")
-        immobilisation.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
+        immobilisation.geometry("420x100+10+160")  # Position du message
         texte_événement_immobilisation = Label(
             immobilisation, 
-            text="UN PIÈGE À OURS\nQUI VOUS A IMMOBILISÉ", 
+            text="UN PIÈGE À OURS\nQUI VOUS A IMMOBILISÉ", # Message
             font=("Kristen ITC", 16, "bold"), 
             bg="grey25", 
             fg="goldenrod"
@@ -417,67 +430,46 @@ def Labyrinthe():
         immobilisation.after(3000, immobilisation.destroy)  # Réactive les événements après 3 secondes
 
  
-    def destruction_armure(fenetre): 
-        destruction_armure = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
+    def destruction_armure(fenetre): # Fonction pour afficher le statut de destruction d'armure lorsque le joueur rencontre de l'acide
+        destruction_armure = Toplevel(fenetre) # Crée la fenêtre d'événement "destruction_armure"
         destruction_armure.configure(bg="grey25")
-        destruction_armure.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
+        destruction_armure.geometry("420x100+10+160")  # Position du message
         texte_événement_destruction_armure = Label(
             destruction_armure, 
-            text="DE L'ACIDE SULFURIQUE\nVOTRE ARMURE DISPARAIT", 
+            text="DE L'ACIDE SULFURIQUE\nVOTRE ARMURE DISPARAIT", # Message
             font=("Kristen ITC", 16, "bold"), 
             bg="grey25", 
             fg="goldenrod"
         )
         texte_événement_destruction_armure.pack(expand=True)
-        destruction_armure.focus_set()
-        destruction_armure.after(500, destruction_armure.destroy)
+        destruction_armure.after(2500, destruction_armure.destroy)
 
 
     def soignement(inventaire, fenetre):
+        def creation_fenetre_soin(changement_texte): 
+            soin = Toplevel(fenetre) # Crée la fenêtre d'événement "soin"
+            soin.configure(bg="grey25")
+            soin.geometry("420x100+10+160")  # Positionne du message
+            texte_événement_soin = Label(
+                soin, 
+                text = changement_texte, # Message
+                font=("Kristen ITC", 14, "bold"), 
+                bg="grey25", 
+                fg="goldenrod"
+            )
+            texte_événement_soin.pack(expand=True)
+            soin.focus_set()
+            soin.after(500, soin.destroy)
+
         if inventaire["PV"] < 5 and inventaire["POTION(S) DE SOIN"] >= 1: # Soin en dessous d'un certain seuil de vie si nombre de potion suffisant
             inventaire["PV"] += 1
             inventaire["POTION(S) DE SOIN"] -= 1
-            destruction_armure = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
-            destruction_armure.configure(bg="grey25")
-            destruction_armure.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
-            texte_événement_destruction_armure = Label(
-                destruction_armure, 
-                text="VOUS VENEZ DE VOUS SOIGNER", 
-                font=("Kristen ITC", 16, "bold"), 
-                bg="grey25", 
-                fg="goldenrod"
-            )
-            texte_événement_destruction_armure.pack(expand=True)
-            destruction_armure.focus_set()
-            destruction_armure.after(500, destruction_armure.destroy)
-        elif inventaire["PV"] > 5:
-            destruction_armure = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
-            destruction_armure.configure(bg="grey25")
-            destruction_armure.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
-            texte_événement_destruction_armure = Label(
-                destruction_armure, 
-                text="VOUS NE POUVEZ PAS VOUS SOIGNER\n\n PV maximum atteints", 
-                font=("Kristen ITC", 12, "bold"), 
-                bg="grey25", 
-                fg="goldenrod"
-            )
-            texte_événement_destruction_armure.pack(expand=True)
-            destruction_armure.focus_set()
-            destruction_armure.after(500, destruction_armure.destroy)
+            creation_fenetre_soin("VOUS VENEZ DE VOUS SOIGNER")
+        elif inventaire["PV"] >= 5:
+            creation_fenetre_soin("IMPOSSIBLE\n\n PV MAXIMUM ATTEINTS")
         else:
-            destruction_armure = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
-            destruction_armure.configure(bg="grey25")
-            destruction_armure.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
-            texte_événement_destruction_armure = Label(
-                destruction_armure, 
-                text="VOUS NE POUVEZ PAS VOUS SOIGNER\n\n Nombre de potion insuffisant", 
-                font=("Kristen ITC", 12, "bold"), 
-                bg="grey25", 
-                fg="goldenrod"
-            )
-            texte_événement_destruction_armure.pack(expand=True)
-            destruction_armure.focus_set()
-            destruction_armure.after(500, destruction_armure.destroy)
+            creation_fenetre_soin("IMPOSSIBLE\n\n NOMBRE DE POTION INSUFFISANT")
+            
         mettre_a_jour_stats()     
     
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
