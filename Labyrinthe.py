@@ -83,6 +83,7 @@ def Labyrinthe():
     bouton_rejouer.place(relx=0.91, rely=0.06, anchor=CENTER)
     
     
+    
     """--------- DICTIONNAIRES ET LISTES ---------"""
 
 
@@ -257,7 +258,7 @@ def Labyrinthe():
                 if itn == 0: # Choix au hasard d'un item dans la liste choisie 
                     alerte = Toplevel(fenetre)
                     alerte.configure(bg="grey25")
-                    alerte.geometry("450x100+10+20") # Positionne les alertes en haut à gauche
+                    alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
                     alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
                     alerteLabel.pack(expand=True)
                     alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
@@ -271,10 +272,11 @@ def Labyrinthe():
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
             fin_du_niveau = Toplevel(fenetre)
             fin_du_niveau.configure(bg="grey25")
-            fin_du_niveau.geometry("800x780+552+137") # Positionne les alertes en haut à gauche
-            alerteLabel = Label(fin_du_niveau, text="FELICITATIONS !\n\nVOUS ÊTES PARVENUS... \n...À LA FIN DU LABYRINTHE!", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+
+            fin_du_niveau.attributes("-fullscreen", True)
+            alerteLabel = Label(fin_du_niveau, text="FELICITATIONS !\n\n\nVOUS ÊTES PARVENUS À SURMONTER\n\n\n LE LABYRINTHE!\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
             alerteLabel.pack(expand=True)
-            fin_du_niveau.after(100000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+            fin_du_niveau.after(10000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
 
 
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
