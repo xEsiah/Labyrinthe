@@ -89,8 +89,8 @@ def Labyrinthe():
 
     ''' Initialisation des listes d'objets et de celles des cases '''
     dictionnaire_pieges = ["PIQUE(S)","TRAPPES(S)","PIÈGE(S) À OURS","FLÈCHE(S) EMPOISONNÈE(S)"]
-    dictionnaire_coffres = ["CARTE(S)", "POTION(S) DE SOIN", "PLAQUE(S) D'ARMURE"]
-    lc_mystere = [] # Liste cases mystères
+    dictionnaire_coffres = ["POTION(S) DE SOIN", "PLAQUE(S) D'ARMURE"]
+    lc_mystere = {} # Liste des informations complètes des cases mystères
     lc_sols = [] # Liste cases sol
     lc_chemin = [] # Liste cases chemin principal
     case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
@@ -98,11 +98,9 @@ def Labyrinthe():
 
     ''' Gestion de l'inventaire et de sa fenètre  '''
     inventaire_du_personnage = {
-        "Points de vie": 10,
-        "Rapidité": 0,
-        "Vision": 0,
-        "Plaque d'armure" : 0,
-        "Potion de soin" : 0,
+        "PV": 10,
+        "PLAQUE(S) D'ARMURE" : 0,
+        "POTION(S) DE SOIN" : 0,
     }
 
 
@@ -140,17 +138,31 @@ def Labyrinthe():
         if nombre_aléatoire <= 10: # Murs
             création_des_trois_types_de_terrain(0,x,y)
             if [x,y] not in lc_murs:
-                lc_murs.append([x,y])   
+                lc_murs.append([x,y]) 
+                
         elif nombre_aléatoire >= 11 and nombre_aléatoire <= 18: # Sols
             création_des_trois_types_de_terrain(1,x,y) 
             lc_sols.append([x,y]) 
             if [x,y] in lc_murs:
                 lc_murs.remove([x,y])
-            if [x,y] in lc_mystere:
-                lc_mystere.remove([x,y])
+            if (x,y) in lc_mystere:
+                del lc_mystere[x,y]
+                
         else: # Objets/Pièges
             création_des_trois_types_de_terrain(2,x,y)
-            lc_mystere.append([x,y])
+            mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
+            if mystere == dictionnaire_coffres:
+                nombre_d_objets = random.randint(1,4)
+                random.shuffle(mystere) # Mélange des indices des items dans la liste
+                for itn in range (len(mystere)):
+                    if itn == 0: # Choix au hasard d'un item dans la liste choisie 
+                        lc_mystere[x,y] = nombre_d_objets,mystere[itn]
+            else:
+                random.shuffle(mystere) # Mélange des indices des items dans la liste
+                for itn in range (len(mystere)):
+                    if itn == 0: # Choix au hasard d'un item dans la liste choisie 
+                        lc_mystere[x,y] = 1,mystere[itn]          
+                
             if [x,y] in lc_murs:
                 lc_murs.remove([x,y])
         return lc_murs,lc_sols, lc_mystere
@@ -171,11 +183,13 @@ def Labyrinthe():
         if voisins:
             chemin_x, chemin_y = random.choice(voisins)
 
-    ''' Remplissage de la grille du labyrinthe avec des cases murs/ mystère/ sol '''
+    ''' Remplissage de la grille du labyrinthe avec des cases murs/ mystères/ sols '''
     for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
         for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
             if [positionX,positionY] not in lc_chemin:
                 generation_terrain(random.randint(0,22), positionX, positionY) # Première génération du terrain (murs)
+    print(lc_mystere)
+    print(len(lc_mystere))
     
     ''' Gestion de l'entré et de la sortie '''       
     dimension_labyrinthe.create_rectangle( # Dessin de l'entrée sur 2 cases
@@ -192,14 +206,14 @@ def Labyrinthe():
 
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie ''' 
 
-    if [entree_x, 30] in lc_mystere:
-        lc_mystere.remove([entree_x, 30])  # Vide la case entrée+1 de la liste des cases mystères      
+    # if [entree_x, 30] in lc_mystere:
+    #     lc_mystere.remove([entree_x, 30])  # Vide la case entrée+1 de la liste des cases mystères      
     if [sortie_x, 840] in lc_murs:
         lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs        
-    if [sortie_x, 840] in lc_mystere:
-        lc_mystere.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des cases mystères
-    if [sortie_x, 870] in lc_mystere:
-        lc_mystere.remove([sortie_x, 870])  # Vide la case sortie de la liste des cases mystères
+    # if [sortie_x, 840] in lc_mystere:
+    #     lc_mystere.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des cases mystères
+    # if [sortie_x, 870] in lc_mystere:
+    #     lc_mystere.remove([sortie_x, 870])  # Vide la case sortie de la liste des cases mystères
     if [sortie_x, 870] in lc_murs:
         lc_murs.remove([sortie_x, 870])  # Vide la case sortie de la liste des murs
 
@@ -237,36 +251,40 @@ def Labyrinthe():
         nouvelles_coord = [int(x1) - 5, int(y1) - 5] # Cela facilite la gestion des collisions, des cases objets et de la case de sortie (écran de victoire)
         
         interactions_murs(nouvelles_coord,direction_x,direction_y)
-        interactions_cases_mystère(nouvelles_coord,case_mystere,fenetre_jeu)
+        interactions_cases_mystère(nouvelles_coord,lc_mystere,fenetre_jeu)
         interactions_sortie(nouvelles_coord,sortie_x,fenetre_jeu)
         print(nouvelles_coord)
 
 
     ''' Interactions avec les murs, les cases mystères et la sortie '''   
     def interactions_murs(coordonnées,x,y):   
+        
         if coordonnées in lc_murs: # Gestion des collisions (changement de couleur si un mur est rencontré et retour à la case d'avant)
             dimension_labyrinthe.itemconfig(personnage, fill="firebrick")
             dimension_labyrinthe.move(personnage, -x, -y)
 
 
     def interactions_cases_mystère(coordonnées,mystere,fenetre):
-        nombre_d_objets = random.randint(1,len(mystere))
-        mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
-        random.shuffle(mystere) # Mélange des indices des items dans la liste
-        if coordonnées in lc_mystere:
-            for itn in range (len(mystere)):
-                if itn == 0: # Choix au hasard d'un item dans la liste choisie 
-                    alerte = Toplevel(fenetre)
-                    alerte.configure(bg="grey25")
-                    alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
-                    alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-                    alerteLabel.pack(expand=True)
-                    alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
-                    if mystere[itn] in dictionnaire_coffres: # Personalisation du message si rencontre d'un bonus
-                        afficher_evenements(fenetre, nombre_d_objets, mystere[itn])
-                    else: # Personalisation du message si rencontre d'un malus
-                        afficher_evenements(fenetre, nombre_d_objets, mystere[itn])
-
+        coord_tuple = tuple(coordonnées)
+        if coord_tuple in mystere:
+            
+            nombre, objet = mystere[coord_tuple]
+            
+            alerte = Toplevel(fenetre)
+            alerte.configure(bg="grey25")
+            alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
+            alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            alerteLabel.pack(expand=True)
+            alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
+            print(f"Vous avez trouvé {nombre} {objet} !")
+        # Recherche de l'objet correspondant
+        # for case in mystere:
+        #     if case[:2] == coordonnées:  # Vérifie si les coordonnées correspondent
+        #         objet = case[3]  # Récupère le nom de l'objet
+        #         nombre = case[2]  # Récupère le nombre d'objets trouvés
+            
+            evenement_cause_par_case_mystere((nombre, objet))
+                    
 
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
@@ -289,6 +307,10 @@ def Labyrinthe():
     # Insérer
     fenetre_jeu.mainloop()
     return 
+
+def evenement_cause_par_case_mystere(mystere):
+    return
+    
 
 def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
     evenement = Toplevel(fenetre)
