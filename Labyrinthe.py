@@ -254,9 +254,8 @@ def Labyrinthe():
         nouvelles_coord = [int(x1) - 5, int(y1) - 5] # Cela facilite la gestion des collisions, des cases objets et de la case de sortie (écran de victoire)
         
         interactions_murs(nouvelles_coord,direction_x,direction_y)
-        interactions_cases_mystère(nouvelles_coord,lc_mystere,fenetre_jeu)
+        interactions_cases_mystère(nouvelles_coord,lc_mystere,fenetre_jeu, inventaire_du_personnage)
         interactions_sortie(nouvelles_coord,sortie_x,fenetre_jeu)
-        print(nouvelles_coord)
 
 
     ''' Interactions avec les murs, les cases mystères et la sortie '''   
@@ -267,14 +266,25 @@ def Labyrinthe():
             dimension_labyrinthe.move(personnage, -x, -y)
 
 
-    def interactions_cases_mystère(coordonnées,mystere,fenetre):
+    def interactions_cases_mystère(coordonnées, mystere, fenetre, inventaire):
         coord_tuple = tuple(coordonnées)
         if coord_tuple in mystere:
+            
             nombre, objet = mystere[coord_tuple]
             
-            print(f"Vous avez trouvé {nombre} {objet} !")
             afficher_evenements(fenetre,nombre,objet)       
-            evenement_cause_par_case_mystere((nombre, objet))
+            evenement_cause_par_case_mystere(nombre, objet, inventaire)
+            
+            x = coord_tuple[0]
+            y = coord_tuple[1]
+            del lc_mystere[x,y]
+            
+            nouveau_sol = dimension_labyrinthe.create_rectangle(
+                x, y,
+                x + taille_cellule, y + taille_cellule,
+                fill="gold3", outline="darkgrey", 
+            ) 
+            dimension_labyrinthe.tag_lower(nouveau_sol, personnage)
 
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
@@ -298,7 +308,9 @@ def Labyrinthe():
     fenetre_jeu.mainloop()
     return 
 
-def evenement_cause_par_case_mystere(nombre,objet):
+def evenement_cause_par_case_mystere(nombre,objet,inventaire):
+    print(objet,nombre,inventaire)
+    
     return
     
 
