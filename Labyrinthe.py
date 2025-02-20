@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import random
+import time
 
 
 def Labyrinthe():
@@ -88,7 +89,7 @@ def Labyrinthe():
 
 
     ''' Initialisation des listes d'objets et de celles des cases '''
-    dictionnaire_pieges = ["PIQUE(S)","TRAPPES(S)","PIÈGE(S) À OURS","FLÈCHE(S) EMPOISONNÈE(S)"]
+    dictionnaire_pieges = ["SALVE DE FLECHE","TRAPPE","PIÈGE À OURS","FLÈCHE EMPOISONNÈE"]
     dictionnaire_coffres = ["POTION(S) DE SOIN", "PLAQUE(S) D'ARMURE"]
     lc_mystere = {} # Liste des informations complètes des cases mystères
     lc_sols = [] # Liste cases sol
@@ -152,7 +153,7 @@ def Labyrinthe():
             création_des_trois_types_de_terrain(2,x,y)
             mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
             if mystere == dictionnaire_coffres:
-                nombre_d_objets = random.randint(1,4)
+                nombre_d_objets = random.randint(0,2)
                 random.shuffle(mystere) # Mélange des indices des items dans la liste
                 for itn in range (len(mystere)):
                     if itn == 0: # Choix au hasard d'un item dans la liste choisie 
@@ -207,14 +208,12 @@ def Labyrinthe():
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie ''' 
 
     if (entree_x, 30) in lc_mystere:
-        print("done")
         del lc_mystere[(entree_x, 30)]  # Vide la case entrée+1 de la liste des cases mystères      
         
     if [sortie_x, 840] in lc_murs:        
         lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs    
             
     if (sortie_x, 840) in lc_mystere:
-        print("1done")
         del lc_mystere[(sortie_x, 840)]  # Vide la case sortie-1 de la liste des cases mystères
         
     if [sortie_x, 870] in lc_murs:
@@ -273,7 +272,7 @@ def Labyrinthe():
             nombre, objet = mystere[coord_tuple]
             
             afficher_evenements(fenetre,nombre,objet)       
-            evenement_cause_par_case_mystere(nombre, objet, inventaire)
+            evenement_cause_par_case_mystere(nombre, objet, inventaire, fenetre)
             
             x = coord_tuple[0]
             y = coord_tuple[1]
@@ -308,11 +307,57 @@ def Labyrinthe():
     fenetre_jeu.mainloop()
     return 
 
-def evenement_cause_par_case_mystere(nombre,objet,inventaire):
-    print(objet,nombre,inventaire)
+def evenement_cause_par_case_mystere(nombre,objet,inventaire, fenetre):
+   
+    if objet == "SALVE DE FLECHE":
+        if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
+            inventaire["PLAQUE(S) D'ARMURE"] -= nombre
+        else:
+            inventaire["PV"] -= nombre
+        
+        
+    # if objet == "TRAPPE":
+        
+        
+    if objet == "PIÈGE À OURS":
+        
+        immobilisation(fenetre)
+           
+    
+        
+       
+        
+            
+      
+        
+    if objet == "FLÈCHE EMPOISONNÈE":
+        if inventaire["PLAQUE(S) D'ARMURE"] >= 2:
+            inventaire["PLAQUE(S) D'ARMURE"] -= 2
+            
+        if inventaire["PLAQUE(S) D'ARMURE"] == 1:
+            inventaire["PLAQUE(S) D'ARMURE"] -= 1
+          
+            inventaire["PV"] -= 1
+        else:
+            inventaire["PV"] -= 2
+ 
+    if objet == "PLAQUE(S) D'ARMURE":
+        inventaire["PLAQUE(S) D'ARMURE"] += nombre
+          
+        
+    if objet == "POTION(S) DE SOIN":
+        inventaire["POTION(S) DE SOIN"] += nombre
+        # if inventaire["PV"] < 10:
+        #     inventaire["PV"] += 1
+        #     inventaire["POTION(S) DE SOIN"] -= 1
+    print(inventaire)    
     
     return
-    
+    inventaire_du_personnage = {
+        "PV": 10,
+        "PLAQUE(S) D'ARMURE" : 0,
+        "POTION(S) DE SOIN" : 0,
+    }
 
 def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
     alerte = Toplevel(fenetre)
@@ -321,14 +366,35 @@ def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
     alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
     alerteLabel.pack(expand=True)
     alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
+    if mystere_element != "PIÈGE À OURS":
+        evenement = Toplevel(fenetre)
+        evenement.configure(bg="grey25")
+        evenement.geometry("420x100+10+20")
+        bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+        bn_label.pack(expand=True)
+        evenement.after(2500, evenement.destroy)
     
-    evenement = Toplevel(fenetre)
-    evenement.configure(bg="grey25")
-    evenement.geometry("420x100+10+20")
-    bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-    bn_label.pack(expand=True)
-    evenement.after(2500, evenement.destroy)
 
+def immobilisation(fenetre):
+    
+    immobilisation = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
+    immobilisation.configure(bg="grey25")
+    immobilisation.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
+    texte_événement_immobilisation = Label(
+        immobilisation, 
+        text="UN PIÈGE À OURS\nQUI VOUS A IMMOBILISÉ", 
+        font=("Kristen ITC", 16, "bold"), 
+        bg="grey25", 
+        fg="goldenrod"
+    )
+    texte_événement_immobilisation.pack(expand=True)
+    immobilisation.focus_set() # Change la fenetre prise en compte, en quelque sorte elle devient la fenetre principale tant que non détruite
+    immobilisation.after(3000, immobilisation.destroy)  # Réactive les événements après 3 secondes
+
+        
+
+    
+    
 def rejouer(fenetre):
     fenetre.destroy() 
     Labyrinthe()
