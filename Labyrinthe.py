@@ -153,7 +153,7 @@ def Labyrinthe():
             création_des_trois_types_de_terrain(2,x,y)
             mystere = random.choice(case_mystere) # Choix au hasard d'un des 2 types de case mystère
             if mystere == dictionnaire_coffres:
-                nombre_d_objets = random.randint(0,2)
+                nombre_d_objets = random.randint(1,3)
                 random.shuffle(mystere) # Mélange des indices des items dans la liste
                 for itn in range (len(mystere)):
                     if itn == 0: # Choix au hasard d'un item dans la liste choisie 
@@ -184,13 +184,13 @@ def Labyrinthe():
         if voisins:
             chemin_x, chemin_y = random.choice(voisins)
 
+
     ''' Remplissage de la grille du labyrinthe avec des cases murs/ mystères/ sols '''
     for positionX in range(taille_cellule, largeur_ecran-taille_cellule, taille_cellule):  
         for positionY in range(taille_cellule, hauteur_ecran-taille_cellule, taille_cellule): 
             if [positionX,positionY] not in lc_chemin:
                 generation_terrain(random.randint(0,22), positionX, positionY) # Première génération du terrain (murs)
-    print(lc_mystere)
-    print(len(lc_mystere))
+    
     
     ''' Gestion de l'entré et de la sortie '''       
     dimension_labyrinthe.create_rectangle( # Dessin de l'entrée sur 2 cases
@@ -206,21 +206,17 @@ def Labyrinthe():
 
 
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie ''' 
-
     if (entree_x, 30) in lc_mystere:
-        del lc_mystere[(entree_x, 30)]  # Vide la case entrée+1 de la liste des cases mystères      
-        
+        del lc_mystere[(entree_x, 30)]  # Vide la case entrée+1 de la liste des cases mystères          
     if [sortie_x, 840] in lc_murs:        
-        lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs    
-            
+        lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs            
     if (sortie_x, 840) in lc_mystere:
-        del lc_mystere[(sortie_x, 840)]  # Vide la case sortie-1 de la liste des cases mystères
-        
+        del lc_mystere[(sortie_x, 840)]  # Vide la case sortie-1 de la liste des cases mystères    
     if [sortie_x, 870] in lc_murs:
         lc_murs.remove([sortie_x, 870])  # Vide la case sortie de la liste des murs
 
 
-    '''--------- INSERTION DU PERSONNAGE ---------'''
+    '''--------- PERSONNAGE ---------'''
 
 
     ''' Design du personnage et position de départ '''
@@ -257,9 +253,8 @@ def Labyrinthe():
         interactions_sortie(nouvelles_coord,sortie_x,fenetre_jeu)
 
 
-    ''' Interactions avec les murs, les cases mystères et la sortie '''   
-    def interactions_murs(coordonnées,x,y):   
-        
+    ''' Interactions avec les murs, les cases mystères et la sortie et affichage des événements '''   
+    def interactions_murs(coordonnées,x,y):    
         if coordonnées in lc_murs: # Gestion des collisions (changement de couleur si un mur est rencontré et retour à la case d'avant)
             dimension_labyrinthe.itemconfig(personnage, fill="firebrick")
             dimension_labyrinthe.move(personnage, -x, -y)
@@ -268,16 +263,12 @@ def Labyrinthe():
     def interactions_cases_mystère(coordonnées, mystere, fenetre, inventaire):
         coord_tuple = tuple(coordonnées)
         if coord_tuple in mystere:
-            
             nombre, objet = mystere[coord_tuple]
-            
             afficher_evenements(fenetre,nombre,objet)       
             evenement_cause_par_case_mystere(nombre, objet, inventaire, fenetre)
-            
             x = coord_tuple[0]
             y = coord_tuple[1]
             del lc_mystere[x,y]
-            
             nouveau_sol = dimension_labyrinthe.create_rectangle(
                 x, y,
                 x + taille_cellule, y + taille_cellule,
@@ -285,111 +276,107 @@ def Labyrinthe():
             ) 
             dimension_labyrinthe.tag_lower(nouveau_sol, personnage)
 
+
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
             fin_du_niveau = Toplevel(fenetre)
             fin_du_niveau.configure(bg="grey25")
-
             fin_du_niveau.attributes("-fullscreen", True)
             alerteLabel = Label(fin_du_niveau, text="FELICITATIONS !\n\n\nVOUS ÊTES PARVENUS À SURMONTER\n\n\n LE LABYRINTHE!\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
             alerteLabel.pack(expand=True)
             fin_du_niveau.after(10000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
 
+  
+    def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
+        affichage_evenement = Toplevel(fenetre)
+        affichage_evenement.configure(bg="grey25")
+        affichage_evenement.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
+        alerteLabel = Label(affichage_evenement, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+        alerteLabel.pack(expand=True)
+        affichage_evenement.after(1200, affichage_evenement.destroy) # Fermeture automatique après le temps choisi
+        if mystere_element != "PIÈGE À OURS":
+            evenement = Toplevel(fenetre)
+            evenement.configure(bg="grey25")
+            evenement.geometry("420x100+10+20")
+            bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+            bn_label.pack(expand=True)
+            evenement.after(2500, evenement.destroy)
+
+                     
+    '''  Gestion des conséquences des événements sur les statuts du joueur '''   
+    def evenement_cause_par_case_mystere(nombre,objet,inventaire, fenetre):
+        if objet == "SALVE DE FLECHE":
+            if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
+                inventaire["PLAQUE(S) D'ARMURE"] -= nombre
+            else:
+                inventaire["PV"] -= nombre
+        if objet == "TRAPPE": # Renvoie le personnage à l'entrée
+            dimension_labyrinthe.coords(
+                personnage,
+                entree_x + 5, 35,  
+                entree_x + taille_cellule - 5, taille_cellule + 25
+            )      
+        if objet == "PIÈGE À OURS":
+            immobilisation(fenetre)
+            if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
+                inventaire["PLAQUE(S) D'ARMURE"] -= nombre
+            else:
+                inventaire["PV"] -= nombre   
+        if objet == "FLÈCHE EMPOISONNÈE": # Idée de dégats en différé
+            if inventaire["PLAQUE(S) D'ARMURE"] != 0:
+                inventaire["PLAQUE(S) D'ARMURE"] = 0
+            else:
+                inventaire["PV"] -= 2 
+                
+        if objet == "PLAQUE(S) D'ARMURE":
+            inventaire["PLAQUE(S) D'ARMURE"] += nombre
+        if objet == "POTION(S) DE SOIN" and inventaire["POTION(S) DE SOIN"] < 5:
+            inventaire["POTION(S) DE SOIN"] += nombre
+            
+        while inventaire["PV"] < 5 and inventaire["POTION(S) DE SOIN"] >= 1: # Soin automatique en dessous d'un certain seuil de vie si nombre de potion suffisant
+            inventaire["PV"] += 1
+            inventaire["POTION(S) DE SOIN"] -= 1                  
+        if inventaire["PV"] <= 0: # Condition de GAME OVER
+            partie_perdue = Toplevel(fenetre)
+            partie_perdue.configure(bg="grey25")
+            partie_perdue.attributes("-fullscreen", True)
+            alerteLabel = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+            alerteLabel.pack(expand=True)
+            partie_perdue.after(10000, partie_perdue.destroy) # Fermeture automatique après le temps choisi
+            rejouer(fenetre)
+            
+        print(objet)
+        print(inventaire)
+
+
+        
+
+    def immobilisation(fenetre):  
+        immobilisation = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
+        immobilisation.configure(bg="grey25")
+        immobilisation.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
+        texte_événement_immobilisation = Label(
+            immobilisation, 
+            text="UN PIÈGE À OURS\nQUI VOUS A IMMOBILISÉ", 
+            font=("Kristen ITC", 16, "bold"), 
+            bg="grey25", 
+            fg="goldenrod"
+        )
+        texte_événement_immobilisation.pack(expand=True)
+        immobilisation.focus_set() # Change la fenetre prise en compte, en quelque sorte elle devient la fenetre principale tant que non détruite
+        immobilisation.after(3000, immobilisation.destroy)  # Réactive les événements après 3 secondes
+        return
+
 
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
-
 
     fenetre_jeu.bind("<Up>", deplacement_personnage)
     fenetre_jeu.bind("<Down>", deplacement_personnage)
     fenetre_jeu.bind("<Left>", deplacement_personnage)
     fenetre_jeu.bind("<Right>", deplacement_personnage)  
-    # Insérer
+    # Insérer autres commandes
     fenetre_jeu.mainloop()
-    return 
 
-def evenement_cause_par_case_mystere(nombre,objet,inventaire, fenetre):
-   
-    if objet == "SALVE DE FLECHE":
-        if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
-            inventaire["PLAQUE(S) D'ARMURE"] -= nombre
-        else:
-            inventaire["PV"] -= nombre
-        
-        
-    # if objet == "TRAPPE":
-        
-        
-    if objet == "PIÈGE À OURS":
-        immobilisation(fenetre)
-        if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
-            inventaire["PLAQUE(S) D'ARMURE"] -= nombre
-        else:
-            inventaire["PV"] -= nombre
-        
-    if objet == "FLÈCHE EMPOISONNÈE":
-        if inventaire["PLAQUE(S) D'ARMURE"] >= 3:
-            inventaire["PLAQUE(S) D'ARMURE"] -= 3
-        if inventaire["PLAQUE(S) D'ARMURE"] == 2:
-            inventaire["PLAQUE(S) D'ARMURE"] -= 2  
-            inventaire["PV"] -= 1
-        if inventaire["PLAQUE(S) D'ARMURE"] == 1:
-            inventaire["PLAQUE(S) D'ARMURE"] -= 1
-            inventaire["PV"] -= 2
-        else:
-            inventaire["PV"] -= 3
- 
-    if objet == "PLAQUE(S) D'ARMURE":
-        inventaire["PLAQUE(S) D'ARMURE"] += nombre
-  
-    if objet == "POTION(S) DE SOIN" and inventaire["POTION(S) DE SOIN"] < 5:
-        inventaire["POTION(S) DE SOIN"] += nombre
-    while inventaire["PV"] < 5 and inventaire["POTION(S) DE SOIN"] >= 1:
-        inventaire["PV"] += 1
-        inventaire["POTION(S) DE SOIN"] -= 1
-                
-                
-    if inventaire["PV"] <= 0:
-        partie_perdue = Toplevel(fenetre)
-        partie_perdue.configure(bg="grey25")
-        partie_perdue.attributes("-fullscreen", True)
-        alerteLabel = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
-        alerteLabel.pack(expand=True)
-        partie_perdue.after(10000, partie_perdue.destroy) # Fermeture automatique après le temps choisi
-        rejouer(fenetre)
-    print(inventaire)    
-    
-    return
-
-def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
-    affichage_evenement = Toplevel(fenetre)
-    affichage_evenement.configure(bg="grey25")
-    affichage_evenement.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
-    alerteLabel = Label(affichage_evenement, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-    alerteLabel.pack(expand=True)
-    affichage_evenement.after(1200, affichage_evenement.destroy) # Fermeture automatique après le temps choisi
-    if mystere_element != "PIÈGE À OURS":
-        evenement = Toplevel(fenetre)
-        evenement.configure(bg="grey25")
-        evenement.geometry("420x100+10+20")
-        bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-        bn_label.pack(expand=True)
-        evenement.after(2500, evenement.destroy)
-    
-
-def immobilisation(fenetre):  
-    immobilisation = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
-    immobilisation.configure(bg="grey25")
-    immobilisation.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
-    texte_événement_immobilisation = Label(
-        immobilisation, 
-        text="UN PIÈGE À OURS\nQUI VOUS A IMMOBILISÉ", 
-        font=("Kristen ITC", 16, "bold"), 
-        bg="grey25", 
-        fg="goldenrod"
-    )
-    texte_événement_immobilisation.pack(expand=True)
-    immobilisation.focus_set() # Change la fenetre prise en compte, en quelque sorte elle devient la fenetre principale tant que non détruite
-    immobilisation.after(3000, immobilisation.destroy)  # Réactive les événements après 3 secondes
 
 def rejouer(fenetre):
     fenetre.destroy() 
