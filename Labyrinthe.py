@@ -50,11 +50,11 @@ def Labyrinthe():
 
     ''' Création des boutons '''
     # Importation d'images pour illustrer les boutons
-    image_importee2 =  Image.open("ressources/Sortie.png")
-    image_porte = ImageTk.PhotoImage(image_importee2)
+    image_importee1 =  Image.open("ressources/Sortie.png")
+    image_porte = ImageTk.PhotoImage(image_importee1)
     
-    image_importee3 = Image.open("ressources/Rejouer.png")
-    image_rejouer = ImageTk.PhotoImage(image_importee3)
+    image_importee2 = Image.open("ressources/Rejouer.png")
+    image_rejouer = ImageTk.PhotoImage(image_importee2)
     
     bouton_quitter = Button(
         fond_fenetre, 
@@ -97,14 +97,60 @@ def Labyrinthe():
     case_mystere = [dictionnaire_coffres, dictionnaire_pieges]
 
 
-    ''' Gestion de l'inventaire et de sa fenètre  '''
+    ''' Inventaire et ressources associées  '''
     inventaire_du_personnage = {
         "PV": 5,
         "PLAQUE(S) D'ARMURE" : 0,
         "POTION(S) DE SOIN" : 0,
     }
+    
+    image_importee3 =  Image.open("ressources/Coeur.png")
+    image_coeur = ImageTk.PhotoImage(image_importee3)
+    image_importee4 =  Image.open("ressources/Potion.png")
+    image_potion = ImageTk.PhotoImage(image_importee4)
+    image_importee5 =  Image.open("ressources/Armure.png")
+    image_armure = ImageTk.PhotoImage(image_importee5)
+    
+    affichage_nombre_pv = Label(
+    fond_fenetre, 
+    text=inventaire_du_personnage["PV"], 
+    font=("Kristen ITC", 60, "bold"),
+    bg="grey12", 
+    fg="goldenrod"
+    )
+    affichage_nombre_pv.place(relx=0.1, rely=0.3)
+    
+    affichage_nombre_potion = Label(
+    fond_fenetre, 
+    text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"], 
+    font=("Kristen ITC", 60, "bold"),
+    bg="grey12", 
+    fg="goldenrod"
+    )
+    affichage_nombre_potion.place(relx=0.1, rely=0.5) 
+    
+    affichage_nombre_armure = Label(
+    fond_fenetre, 
+    text=inventaire_du_personnage["POTION(S) DE SOIN"], 
+    font=("Kristen ITC", 60, "bold"),
+    bg="grey12", 
+    fg="goldenrod"
+    )
+    affichage_nombre_armure.place(relx=0.1, rely=0.7) 
+    
+    affichage_nombre_pv_icon = Label(fond_fenetre, image=image_coeur, bg="grey12")
+    affichage_nombre_pv_icon.place(relx=0.02, rely=0.3)
 
-
+    affichage_nombre_potion_icon = Label(fond_fenetre, image=image_potion, bg="grey12")
+    affichage_nombre_potion_icon.place(relx=0.02, rely=0.5)
+    
+    affichage_nombre_armure_icon = Label(fond_fenetre, image=image_armure, bg="grey12")
+    affichage_nombre_armure_icon.place(relx=0.02, rely=0.7)
+    def mettre_a_jour_stats():
+        affichage_nombre_pv.config(text=inventaire_du_personnage["PV"])
+        affichage_nombre_armure.config(text=inventaire_du_personnage["PLAQUE(S) D'ARMURE"])
+        affichage_nombre_potion.config(text=inventaire_du_personnage["POTION(S) DE SOIN"])
+    
     ''' Liste générant les murs extérieurs et mettant en mémoire leur position '''
     lc_murs = [[0, y] for y in range(0, 901, taille_cellule)] + [[x, 0] for x in range(0, 901, taille_cellule)] + [[870, y] for y in range(0, 901, taille_cellule)] + [[x, 870] for x in range(0, 871, taille_cellule)] # Liste cases mur
     
@@ -227,6 +273,8 @@ def Labyrinthe():
         fill="purple", outline="black"
     )
 
+    ''' Affichage des status du personnage '''
+    
 
     ''' Deplacement du personnage et évenements '''
     def deplacement_personnage(commande):
@@ -344,7 +392,7 @@ def Labyrinthe():
             alerteLabel.pack(expand=True)
             partie_perdue.after(10000, partie_perdue.destroy) # Fermeture automatique après le temps choisi
             rejouer(fenetre)
-            
+        mettre_a_jour_stats()    
         print(objet)
         print(inventaire)
 
