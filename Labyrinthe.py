@@ -99,7 +99,7 @@ def Labyrinthe():
 
     ''' Gestion de l'inventaire et de sa fenètre  '''
     inventaire_du_personnage = {
-        "PV": 10,
+        "PV": 5,
         "PLAQUE(S) D'ARMURE" : 0,
         "POTION(S) DE SOIN" : 0,
     }
@@ -320,52 +320,53 @@ def evenement_cause_par_case_mystere(nombre,objet,inventaire, fenetre):
         
         
     if objet == "PIÈGE À OURS":
-        
         immobilisation(fenetre)
-           
-    
-        
-       
-        
-            
-      
+        if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
+            inventaire["PLAQUE(S) D'ARMURE"] -= nombre
+        else:
+            inventaire["PV"] -= nombre
         
     if objet == "FLÈCHE EMPOISONNÈE":
-        if inventaire["PLAQUE(S) D'ARMURE"] >= 2:
-            inventaire["PLAQUE(S) D'ARMURE"] -= 2
-            
+        if inventaire["PLAQUE(S) D'ARMURE"] >= 3:
+            inventaire["PLAQUE(S) D'ARMURE"] -= 3
+        if inventaire["PLAQUE(S) D'ARMURE"] == 2:
+            inventaire["PLAQUE(S) D'ARMURE"] -= 2  
+            inventaire["PV"] -= 1
         if inventaire["PLAQUE(S) D'ARMURE"] == 1:
             inventaire["PLAQUE(S) D'ARMURE"] -= 1
-          
-            inventaire["PV"] -= 1
-        else:
             inventaire["PV"] -= 2
+        else:
+            inventaire["PV"] -= 3
  
     if objet == "PLAQUE(S) D'ARMURE":
         inventaire["PLAQUE(S) D'ARMURE"] += nombre
-          
-        
-    if objet == "POTION(S) DE SOIN":
+  
+    if objet == "POTION(S) DE SOIN" and inventaire["POTION(S) DE SOIN"] < 5:
         inventaire["POTION(S) DE SOIN"] += nombre
-        # if inventaire["PV"] < 10:
-        #     inventaire["PV"] += 1
-        #     inventaire["POTION(S) DE SOIN"] -= 1
+    while inventaire["PV"] < 5 and inventaire["POTION(S) DE SOIN"] >= 1:
+        inventaire["PV"] += 1
+        inventaire["POTION(S) DE SOIN"] -= 1
+                
+                
+    if inventaire["PV"] <= 0:
+        partie_perdue = Toplevel(fenetre)
+        partie_perdue.configure(bg="grey25")
+        partie_perdue.attributes("-fullscreen", True)
+        alerteLabel = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+        alerteLabel.pack(expand=True)
+        partie_perdue.after(10000, partie_perdue.destroy) # Fermeture automatique après le temps choisi
+        rejouer(fenetre)
     print(inventaire)    
     
     return
-    inventaire_du_personnage = {
-        "PV": 10,
-        "PLAQUE(S) D'ARMURE" : 0,
-        "POTION(S) DE SOIN" : 0,
-    }
 
 def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
-    alerte = Toplevel(fenetre)
-    alerte.configure(bg="grey25")
-    alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
-    alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+    affichage_evenement = Toplevel(fenetre)
+    affichage_evenement.configure(bg="grey25")
+    affichage_evenement.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
+    alerteLabel = Label(affichage_evenement, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
     alerteLabel.pack(expand=True)
-    alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
+    affichage_evenement.after(1200, affichage_evenement.destroy) # Fermeture automatique après le temps choisi
     if mystere_element != "PIÈGE À OURS":
         evenement = Toplevel(fenetre)
         evenement.configure(bg="grey25")
@@ -375,8 +376,7 @@ def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
         evenement.after(2500, evenement.destroy)
     
 
-def immobilisation(fenetre):
-    
+def immobilisation(fenetre):  
     immobilisation = Toplevel(fenetre) # Crée la fenêtre d'événement "immobilisation"
     immobilisation.configure(bg="grey25")
     immobilisation.geometry("420x100+10+160")  # Positionne l'alerte en haut à gauche
@@ -391,10 +391,6 @@ def immobilisation(fenetre):
     immobilisation.focus_set() # Change la fenetre prise en compte, en quelque sorte elle devient la fenetre principale tant que non détruite
     immobilisation.after(3000, immobilisation.destroy)  # Réactive les événements après 3 secondes
 
-        
-
-    
-    
 def rejouer(fenetre):
     fenetre.destroy() 
     Labyrinthe()
