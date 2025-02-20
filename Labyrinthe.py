@@ -161,10 +161,10 @@ def Labyrinthe():
                 random.shuffle(mystere) # Mélange des indices des items dans la liste
                 for itn in range (len(mystere)):
                     if itn == 0: # Choix au hasard d'un item dans la liste choisie 
-                        lc_mystere[x,y] = 1,mystere[itn]          
-                
+                        lc_mystere[x,y] = 1,mystere[itn]              
             if [x,y] in lc_murs:
                 lc_murs.remove([x,y])
+                
         return lc_murs,lc_sols, lc_mystere
 
 
@@ -206,14 +206,17 @@ def Labyrinthe():
 
     ''' Suppresion des murs et des cases mystères qui peuvent être générés "dans" l'entrée et la sortie ''' 
 
-    # if [entree_x, 30] in lc_mystere:
-    #     lc_mystere.remove([entree_x, 30])  # Vide la case entrée+1 de la liste des cases mystères      
-    if [sortie_x, 840] in lc_murs:
-        lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs        
-    # if [sortie_x, 840] in lc_mystere:
-    #     lc_mystere.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des cases mystères
-    # if [sortie_x, 870] in lc_mystere:
-    #     lc_mystere.remove([sortie_x, 870])  # Vide la case sortie de la liste des cases mystères
+    if (entree_x, 30) in lc_mystere:
+        print("done")
+        del lc_mystere[(entree_x, 30)]  # Vide la case entrée+1 de la liste des cases mystères      
+        
+    if [sortie_x, 840] in lc_murs:        
+        lc_murs.remove([sortie_x, 840])  # Vide la case sortie-1 de la liste des murs    
+            
+    if (sortie_x, 840) in lc_mystere:
+        print("1done")
+        del lc_mystere[(sortie_x, 840)]  # Vide la case sortie-1 de la liste des cases mystères
+        
     if [sortie_x, 870] in lc_murs:
         lc_murs.remove([sortie_x, 870])  # Vide la case sortie de la liste des murs
 
@@ -267,24 +270,11 @@ def Labyrinthe():
     def interactions_cases_mystère(coordonnées,mystere,fenetre):
         coord_tuple = tuple(coordonnées)
         if coord_tuple in mystere:
-            
             nombre, objet = mystere[coord_tuple]
             
-            alerte = Toplevel(fenetre)
-            alerte.configure(bg="grey25")
-            alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
-            alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
-            alerteLabel.pack(expand=True)
-            alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
             print(f"Vous avez trouvé {nombre} {objet} !")
-        # Recherche de l'objet correspondant
-        # for case in mystere:
-        #     if case[:2] == coordonnées:  # Vérifie si les coordonnées correspondent
-        #         objet = case[3]  # Récupère le nom de l'objet
-        #         nombre = case[2]  # Récupère le nombre d'objets trouvés
-            
+            afficher_evenements(fenetre,nombre,objet)       
             evenement_cause_par_case_mystere((nombre, objet))
-                    
 
     def interactions_sortie(coordonnées,fin,fenetre):
         if coordonnées == [fin,870]: # Gestion de la case de sortie et de l'écran de victoire
@@ -308,14 +298,21 @@ def Labyrinthe():
     fenetre_jeu.mainloop()
     return 
 
-def evenement_cause_par_case_mystere(mystere):
+def evenement_cause_par_case_mystere(nombre,objet):
     return
     
 
 def afficher_evenements(fenetre, nombre_d_objets, mystere_element):
+    alerte = Toplevel(fenetre)
+    alerte.configure(bg="grey25")
+    alerte.geometry("420x100+10+20") # Positionne les alertes en haut à gauche
+    alerteLabel = Label(alerte, text="OH ! \nCETTE CASE DISSIMULE...", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
+    alerteLabel.pack(expand=True)
+    alerte.after(1200, alerte.destroy) # Fermeture automatique après le temps choisi
+    
     evenement = Toplevel(fenetre)
     evenement.configure(bg="grey25")
-    evenement.geometry("450x100+10+20")
+    evenement.geometry("420x100+10+20")
     bn_label = Label(evenement, text=f"{nombre_d_objets} {mystere_element}", font=("Kristen ITC", 16, "bold"), bg="grey25", fg="goldenrod")
     bn_label.pack(expand=True)
     evenement.after(2500, evenement.destroy)
