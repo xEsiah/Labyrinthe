@@ -132,13 +132,13 @@ def Labyrinthe():
 
 
     ''' Fonction de generation des cases du terrain et de la gestion des listes associées (fait appel à la fonction de création des cases) '''  
-    def generation_terrain(nombre_aléatoire,x,y): # Fonction pour déterminer les probabilité de générer une case mur ou une case sol
-        if nombre_aléatoire <= 10: # Murs
+    def generation_terrain(nombre_aleatoire,x,y): # Fonction pour déterminer les probabilité de générer une case mur ou une case sol
+        if nombre_aleatoire <= 10: # Murs
             création_des_trois_types_de_terrain(0,x,y)
             if [x,y] not in lc_murs:
                 lc_murs.append([x,y]) 
                 
-        elif nombre_aléatoire >= 11 and nombre_aléatoire <= 18: # Sols
+        elif nombre_aleatoire >= 11 and nombre_aleatoire <= 18: # Sols
             création_des_trois_types_de_terrain(1,x,y) 
             lc_sols.append([x,y]) 
             if [x,y] in lc_murs:
@@ -328,7 +328,8 @@ def Labyrinthe():
             fin_du_niveau.attributes("-fullscreen", True)
             alerteSortie = Label(fin_du_niveau, text="FELICITATIONS !\n\n\nVOUS ÊTES PARVENUS À SURMONTER\n\n\n LE LABYRINTHE!\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
             alerteSortie.pack(expand=True)
-            fin_du_niveau.after(10000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
+            fin_du_niveau.after(10000, lambda: fermer_et_rejouer(fenetre)) # Fermeture automatique après le temps choisi
+                # Relance le jeu après la victoire
 
     def afficher_surprise_et_evenements(fenetre, nombre_d_objets, mystere_element): 
         affichage_surprise = Toplevel(fenetre)
@@ -457,19 +458,19 @@ def Labyrinthe():
             
         mettre_a_jour_stats()     
         
-
+    def fermer_et_rejouer(fenetre):
+        for fenetre_ouverte in fenetre.winfo_children():
+            if isinstance(fenetre_ouverte, Toplevel):
+                fenetre_ouverte.destroy()
+            rejouer(fenetre)
+                    
     def fin_de_partie_defaite(fenetre): # Fonction pour perdre la partie
-        def fermer_et_rejouer(fenetre):
-            for fenetre_ouverte in fenetre.winfo_children():
-                if isinstance(fenetre_ouverte, Toplevel):
-                    fenetre_ouverte.destroy()
-                rejouer(fenetre)
         partie_perdue = Toplevel(fenetre)
         partie_perdue.configure(bg="grey25")
         partie_perdue.attributes("-fullscreen", True)
         partie_perdue = Label(partie_perdue, text="QUEL DOMMAGE...\n\nLE LABYRINTHE\n\n A EU RAISON DE VOUS...\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
         partie_perdue.pack(expand=True)
-        partie_perdue.after(5000, fermer_et_rejouer)
+        partie_perdue.after(10000, lambda: fermer_et_rejouer(fenetre))
     
     
     '''--------- APPELS DES FONCTIONS DE COMMANDES DU JOUEUR ---------'''
