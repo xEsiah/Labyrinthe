@@ -326,8 +326,8 @@ def Labyrinthe():
             fin_du_niveau = Toplevel(fenetre)
             fin_du_niveau.configure(bg="grey25")
             fin_du_niveau.attributes("-fullscreen", True)
-            alerteLabel = Label(fin_du_niveau, text="FELICITATIONS !\n\n\nVOUS ÊTES PARVENUS À SURMONTER\n\n\n LE LABYRINTHE!\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
-            alerteLabel.pack(expand=True)
+            alerteSortie = Label(fin_du_niveau, text="FELICITATIONS !\n\n\nVOUS ÊTES PARVENUS À SURMONTER\n\n\n LE LABYRINTHE!\n", font=("Kristen ITC", 32, "bold"), bg="grey25", fg="goldenrod")
+            alerteSortie.pack(expand=True)
             fin_du_niveau.after(10000, fin_du_niveau.destroy) # Fermeture automatique après le temps choisi
 
     def afficher_surprise_et_evenements(fenetre, nombre_d_objets, mystere_element): 
@@ -350,7 +350,6 @@ def Labyrinthe():
                 afficher_événement(fenetre, "UN(E)")    
         else: # Affichage pour les autres pièges
             afficher_événement(fenetre, nombre_d_objets)
-            print("OK")
 
                   
     '''  Gestion des conséquences des événements sur les statuts du joueur '''   
@@ -359,8 +358,7 @@ def Labyrinthe():
             if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
                 inventaire["PLAQUE(S) D'ARMURE"] -= nombre
             else:
-                inventaire["PV"] -= nombre
-                
+                inventaire["PV"] -= nombre      
         if objet == "TRAPPE": # Renvoie le personnage à l'entrée (EASTER EGG: faible chance de l'envoyer à la sortie)
             easter_egg = random.randint(0, 100)
             if easter_egg != 99:
@@ -376,7 +374,6 @@ def Labyrinthe():
                     sortie_x + 5, sortie_y + 5,  
                     sortie_x + taille_cellule - 5, sortie_y + 25
                 )
-            
         if objet == "PIÈGE À OURS": # Immoblise pendant quelques secondes 
             immobilisation(fenetre)
             if inventaire["PLAQUE(S) D'ARMURE"] >= nombre:
@@ -384,8 +381,7 @@ def Labyrinthe():
             else:
                 inventaire["PV"] -= nombre
                 if inventaire["PV"] <= 0:
-                    rejouer(fenetre)
-                    
+                    rejouer(fenetre)          
         if objet == "ACIDE SULFURIQUE": # Supprime toute l'armure
             destruction_armure(fenetre)
             if inventaire["PLAQUE(S) D'ARMURE"] != 0:
